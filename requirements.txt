@@ -1,0 +1,32 @@
+# ============================================================
+# IPLytics — Python Dependencies
+# ============================================================
+# Install with:  pip install -r requirements.txt
+# ============================================================
+
+# --- Backend (FastAPI) ---
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+pydantic-settings==2.5.2
+python-dotenv==1.0.1
+python-multipart==0.0.12
+
+# --- Database ---
+sqlalchemy==2.0.35
+psycopg2-binary==2.9.10
+
+# --- Data Processing ---
+pandas==2.2.3
+
+# --- Frontend ---
+streamlit==1.38.0
+
+# --- Visualization ---
+plotly==5.24.1
+
+# --- AI ---
+google-generativeai==0.8.1
+
+# --- Utilities ---
+requests==2.32.3
