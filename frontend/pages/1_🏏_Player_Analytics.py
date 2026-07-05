@@ -65,6 +65,32 @@ st.set_page_config(
     layout="wide",
 )
 
+# Custom CSS for premium styling (glassmorphic metric cards)
+st.markdown("""
+<style>
+    .stApp {
+        background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+    }
+    div[data-testid="stMetric"] {
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        border: 1px solid #e9456030;
+        border-radius: 12px;
+        padding: 1rem;
+        box-shadow: 0 4px 15px rgba(233, 69, 96, 0.1);
+    }
+    div[data-testid="stMetric"] label {
+        color: #8892b0 !important;
+    }
+    div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
+        color: #e94560 !important;
+        font-weight: 700;
+    }
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0f0f23, #1a1a2e);
+    }
+</style>
+""", unsafe_allow_html=True)
+
 
 def _safe(value, fallback="N/A"):
     """Return the value if it's not None, otherwise return the fallback.
