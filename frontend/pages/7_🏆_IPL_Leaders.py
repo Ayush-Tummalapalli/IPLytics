@@ -154,6 +154,13 @@ caps = data.get("caps", {})
 leaders = data.get("leaderboards", {})
 
 # HTML table helper functions
+def clean_html(html_str: str) -> str:
+    # Strip carriage returns and newlines, and collapse spaces
+    html_str = html_str.replace("\r", "").replace("\n", "")
+    while "  " in html_str:
+        html_str = html_str.replace("  ", " ")
+    return html_str.strip()
+
 def render_caps_table(cap_type, caps_list):
     headers = ["Season", "Player", "Runs Scored" if cap_type == "orange" else "Wickets Taken"]
     badge_class = "orange-badge" if cap_type == "orange" else "purple-badge"
@@ -188,7 +195,7 @@ def render_caps_table(cap_type, caps_list):
         </tbody>
     </table>
     """
-    return table_html
+    return clean_html(table_html)
 
 def render_top10_table(headers, data_list, val_key):
     rows_html = ""
@@ -227,7 +234,7 @@ def render_top10_table(headers, data_list, val_key):
         </tbody>
     </table>
     """
-    return table_html
+    return clean_html(table_html)
 
 def render_batting_avg_table(data_list):
     rows_html = ""
@@ -272,7 +279,7 @@ def render_batting_avg_table(data_list):
         </tbody>
     </table>
     """
-    return table_html
+    return clean_html(table_html)
 
 def render_bowling_avg_table(data_list):
     rows_html = ""
@@ -317,7 +324,7 @@ def render_bowling_avg_table(data_list):
         </tbody>
     </table>
     """
-    return table_html
+    return clean_html(table_html)
 
 # Tabs layout
 tab_caps, tab_batting, tab_bowling = st.tabs([
