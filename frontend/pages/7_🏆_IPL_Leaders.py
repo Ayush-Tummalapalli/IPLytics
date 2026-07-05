@@ -470,6 +470,7 @@ with tab_bowling:
         bowl_avg_list = leaders.get("bowling_average", [])
         if bowl_avg_list:
             df_bowl_avg = pd.DataFrame(bowl_avg_list)
+            df_bowl_avg = df_bowl_avg[["rank", "player", "value"]]
             df_bowl_avg.columns = ["Rank", "Player", "Average"]
             
             fig = px.bar(
