@@ -144,13 +144,11 @@ def render_bowling_metrics(bowling: dict) -> None:
         col.metric(label=label, value=value)
 
 
-def render_season_runs_chart(season_runs: list[dict], player_name: str) -> None:
-    """Plot a bar chart of runs scored per IPL season.
-
-    WHY a bar chart: Season-wise runs are discrete yearly totals — bars
-    make it easy to compare magnitudes across years. We overlay a text
-    label on each bar so exact values are readable without hovering.
-    """
+def render_season_runs_chart(season_runs: list[dict], player_name: str, has_batted: bool) -> None:
+    """Plot a bar chart of runs scored per IPL season."""
+    if not has_batted:
+        st.info("This player hasn't batted in his whole career")
+        return
     if not season_runs:
         st.info("No season-wise run data available for this player.")
         return
@@ -180,8 +178,11 @@ def render_season_runs_chart(season_runs: list[dict], player_name: str) -> None:
     st.plotly_chart(fig, use_container_width=True)
 
 
-def render_season_wickets_chart(season_wickets: list[dict], player_name: str) -> None:
+def render_season_wickets_chart(season_wickets: list[dict], player_name: str, has_bowled: bool) -> None:
     """Plot a bar chart of wickets taken per IPL season."""
+    if not has_bowled:
+        st.info("This player hasn't bowled in his career")
+        return
     if not season_wickets or sum(w.get("wickets", 0) for w in season_wickets) == 0:
         st.info("No season-wise wicket data available for this player.")
         return
@@ -265,6 +266,9 @@ def main() -> None:
     season_runs: list[dict] = stats.get("season_runs", [])
     season_wickets: list[dict] = stats.get("season_wickets", [])
 
+    has_batted = batting.get("matches", 0) > 0
+    has_bowled = bowling.get("matches", 0) > 0
+
     # ── Metric cards ──
     render_batting_metrics(batting)
     st.divider()
@@ -275,10 +279,10 @@ def main() -> None:
     col_season_runs, col_season_wkts = st.columns(2)
 
     with col_season_runs:
-        render_season_runs_chart(season_runs, selected_player)
+        render_season_runs_chart(season_runs, selected_player, has_batted)
 
     with col_season_wkts:
-        render_season_wickets_chart(season_wickets, selected_player)
+        render_season_wickets_chart(season_wickets, selected_player, has_bowled)
 
 
 main()
