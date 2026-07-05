@@ -15,6 +15,7 @@ from backend.app.database.connection import get_db
 from backend.app.analytics.player_analytics import (
     get_player_batting_stats,
     get_player_bowling_stats,
+    get_matchup_stats,
 )
 from backend.app.analytics.team_analytics import (
     get_team_stats,
@@ -100,3 +101,16 @@ def compare_teams(
         "team2": t2_stats,
         "head_to_head": h2h,
     }
+
+
+@router.get("/matchup")
+def get_h2h_matchup(
+    batter: str = Query(..., description="Batter name"),
+    bowler: str = Query(..., description="Bowler name"),
+    db: Session = Depends(get_db),
+) -> dict:
+    """
+    Get head-to-head matchup statistics between a batter and a bowler.
+    """
+    logger.info("API request: matchup '%s' vs '%s'", batter, bowler)
+    return get_matchup_stats(db, batter, bowler)

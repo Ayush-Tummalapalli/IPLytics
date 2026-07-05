@@ -12,9 +12,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 import streamlit as st
 import plotly.graph_objects as go
 
+import pandas as pd
+import plotly.express as px
+
 from frontend.api_client import (
     get_players, get_teams,
     compare_players, compare_teams,
+    get_matchup_stats,
 )
 
 # --- Page Config ---
@@ -44,6 +48,65 @@ st.markdown("""
         color: #f5a623; text-align: center;
         padding: 2rem 0;
     }
+    
+    /* Premium Custom Table Styling */
+    .premium-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(233, 69, 96, 0.15);
+        background: rgba(26, 26, 46, 0.4);
+        color: #ccd6f6;
+        font-family: 'Arial', sans-serif;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .premium-table th {
+        background-color: rgba(22, 33, 62, 0.8);
+        color: #00bcd4;
+        font-weight: bold;
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid rgba(233, 69, 96, 0.2);
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.05em;
+    }
+    .premium-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        font-size: 0.95rem;
+    }
+    .premium-table tr:last-child td {
+        border-bottom: none;
+    }
+    .premium-table tr:hover {
+        background-color: rgba(233, 69, 96, 0.06);
+    }
+    
+    /* Badges */
+    .orange-badge {
+        background-color: rgba(245, 166, 35, 0.15);
+        color: #f5a623;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 0.85rem;
+        border: 1px solid rgba(245, 166, 35, 0.3);
+        display: inline-block;
+    }
+    .purple-badge {
+        background-color: rgba(176, 133, 245, 0.15);
+        color: #b085f5;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 0.85rem;
+        border: 1px solid rgba(176, 133, 245, 0.3);
+        display: inline-block;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -70,7 +133,7 @@ def fetch_teams():
 # --- Main Content ---
 st.title("⚔️ Comparisons")
 
-tab1, tab2 = st.tabs(["🏏 Player vs Player", "🏆 Team vs Team"])
+tab1, tab2, tab3 = st.tabs(["🏏 Player vs Player", "🏆 Team vs Team", "⚔️ Batter vs Bowler Matchup"])
 
 # =============================================
 # PLAYER COMPARISON TAB
@@ -401,3 +464,161 @@ with tab2:
 
         elif t1_name == t2_name:
             st.info("Please select two different teams to compare.")
+
+
+# =============================================
+# BATTER VS BOWLER MATCHUP TAB
+# =============================================
+with tab3:
+    st.markdown("### Batter vs Bowler Head-to-Head (H2H) Matchup")
+    st.markdown("<p style='color: #8892b0; margin-bottom: 2rem;'>Select any batter and bowler to inspect their career rivalry statistics computed from ball-by-ball records.</p>", unsafe_allow_html=True)
+
+    players = fetch_players()
+    if not players:
+        st.error("⚠️ Could not load players. Is the backend running?")
+    else:
+        col_bat, col_vs_m, col_bowl = st.columns([5, 1, 5])
+
+        with col_bat:
+            selected_batter = st.selectbox(
+                "Select Batter",
+                options=players,
+                index=players.index("V Kohli") if "V Kohli" in players else 0,
+                key="matchup_batter",
+            )
+        with col_vs_m:
+            st.markdown('<div class="vs-text">VS</div>', unsafe_allow_html=True)
+        with col_bowl:
+            selected_bowler = st.selectbox(
+                "Select Bowler",
+                options=players,
+                index=players.index("JJ Bumrah") if "JJ Bumrah" in players else 1,
+                key="matchup_bowler",
+            )
+
+        if selected_batter and selected_bowler:
+            with st.spinner(f"Fetching matchup stats between {selected_batter} and {selected_bowler}..."):
+                matchup_data = get_matchup_stats(selected_batter, selected_bowler)
+
+            if matchup_data and matchup_data.get("overall"):
+                overall = matchup_data["overall"]
+                seasons = matchup_data["seasons"]
+
+                # Check if they have ever faced each other
+                total_balls = overall.get("balls", 0)
+                if total_balls == 0:
+                    st.warning(f"⚠️ {selected_batter} has never faced {selected_bowler} in any IPL match.")
+                else:
+                    # Show key metrics in metric cards
+                    st.markdown("#### ⚡ Overall Matchup Aggregates")
+                    
+                    cols = st.columns(7)
+                    metrics = [
+                        ("Runs", f"{overall['runs']}", None),
+                        ("Balls Faced", f"{overall['balls']}", None),
+                        ("Strike Rate", f"{overall['strike_rate']:.2f}", None),
+                        ("Dismissals", f"{overall['dismissals']}", None),
+                        ("Fours", f"{overall['fours']}", None),
+                        ("Sixes", f"{overall['sixes']}", None),
+                        ("Dot Balls", f"{overall['dots']}", None),
+                    ]
+                    for col, (label, val, delta) in zip(cols, metrics):
+                        col.metric(label=label, value=val, delta=delta)
+
+                    st.write("")
+                    st.divider()
+
+                    # Charts & Tables Side-by-Side
+                    col_chart, col_table = st.columns([6, 5])
+
+                    with col_chart:
+                        st.markdown("#### 📈 Season-by-Season Performance")
+                        if seasons:
+                            df_seasons = pd.DataFrame(seasons)
+                            df_seasons["season"] = df_seasons["season"].astype(str)
+
+                            fig = go.Figure()
+                            
+                            # Add Runs as Line
+                            fig.add_trace(go.Scatter(
+                                x=df_seasons["season"],
+                                y=df_seasons["runs"],
+                                name="Runs Scored",
+                                mode="lines+markers",
+                                line=dict(color="#e94560", width=3),
+                                marker=dict(size=8),
+                                hovertemplate="<b>%{x}</b><br>Runs: %{y}<extra></extra>"
+                            ))
+
+                            # Add Wickets as Bar
+                            fig.add_trace(go.Bar(
+                                x=df_seasons["season"],
+                                y=df_seasons["dismissals"],
+                                name="Dismissals",
+                                marker_color="#b085f5",
+                                opacity=0.8,
+                                hovertemplate="<b>%{x}</b><br>Dismissals: %{y}<extra></extra>"
+                            ))
+
+                            fig.update_layout(
+                                template="plotly_dark",
+                                plot_bgcolor="rgba(0,0,0,0)",
+                                paper_bgcolor="rgba(0,0,0,0)",
+                                font=dict(color="#8892b0"),
+                                xaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.05)", title="Season"),
+                                yaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.05)", title="Count"),
+                                legend=dict(x=0.01, y=0.99, bgcolor="rgba(26, 26, 46, 0.6)"),
+                                height=350,
+                                margin=dict(t=20, b=20, l=20, r=20),
+                            )
+                            st.plotly_chart(fig, use_container_width=True)
+                        else:
+                            st.info("No season breakdown available.")
+
+                    with col_table:
+                        st.markdown("#### 📋 Season-by-Season Breakdown")
+                        if seasons:
+                            def clean_table_html(html_str: str) -> str:
+                                html_str = html_str.replace("\r", "").replace("\n", "")
+                                while "  " in html_str:
+                                    html_str = html_str.replace("  ", " ")
+                                return html_str.strip()
+
+                            rows_html = ""
+                            for s in seasons:
+                                row_style = "background: rgba(233, 69, 96, 0.04); font-weight: bold;" if s['dismissals'] > 0 else ""
+                                rows_html += f"""
+                                <tr style="{row_style}">
+                                    <td style="font-weight: bold; width: 100px;">{s['season']}</td>
+                                    <td><strong>{s['runs']}</strong></td>
+                                    <td>{s['balls']}</td>
+                                    <td><strong style='color: #00bcd4;'>{s['strike_rate']:.2f}</strong></td>
+                                    <td>
+                                        <span class="{'purple-badge' if s['dismissals'] > 0 else ''}">
+                                            {s['dismissals']}
+                                        </span>
+                                    </td>
+                                </tr>
+                                """
+
+                            table_html = f"""
+                            <table class="premium-table">
+                                <thead>
+                                    <tr>
+                                        <th>Season</th>
+                                        <th>Runs</th>
+                                        <th>Balls</th>
+                                        <th>Strike Rate</th>
+                                        <th>Dismissals</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {rows_html}
+                                </tbody>
+                            </table>
+                            """
+                            st.markdown(clean_table_html(table_html), unsafe_allow_html=True)
+                        else:
+                            st.info("No season breakdown data available.")
+            else:
+                st.error("⚠️ Failed to load matchup details from the server.")

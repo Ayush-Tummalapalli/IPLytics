@@ -111,6 +111,11 @@ def compare_teams(team1: str, team2: str) -> dict | None:
     return _get("/compare/teams", {"team1": team1, "team2": team2})
 
 
+def get_matchup_stats(batter: str, bowler: str) -> dict | None:
+    """Get head-to-head matchup statistics between a batter and a bowler."""
+    return _get("/compare/matchup", {"batter": batter, "bowler": bowler})
+
+
 # === Trivia & Facts API ===
 
 def get_ipl_facts() -> dict | None:

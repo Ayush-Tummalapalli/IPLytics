@@ -352,3 +352,100 @@ def get_player_season_wickets(session: Session, player_name: str) -> list[dict]:
         {"season": r.season, "wickets": int(r.wickets) if r.wickets else 0}
         for r in results
     ]
+
+
+def get_matchup_stats(session: Session, batter: str, bowler: str) -> dict:
+    """
+    Compute head-to-head matchup statistics between a batter and a bowler.
+    """
+    BOWLER_WICKETS = ["bowled", "caught", "caught and bowled", "hit wicket", "lbw", "stumped"]
+
+    # 1. Overall Aggregates
+    matchup_agg = session.query(
+        func.sum(Delivery.runs_batter).label("runs"),
+        func.sum(case(
+            (Delivery.wicket_kind.in_(BOWLER_WICKETS), 1),
+            else_=0
+        )).label("dismissals"),
+        func.sum(case(
+            (Delivery.runs_batter == 4, 1),
+            else_=0
+        )).label("fours"),
+        func.sum(case(
+            (Delivery.runs_batter == 6, 1),
+            else_=0
+        )).label("sixes"),
+        func.sum(case(
+            (Delivery.runs_total == 0, 1),
+            else_=0
+        )).label("dots")
+    ).filter(
+        Delivery.batter == batter,
+        Delivery.bowler == bowler
+    ).first()
+
+    # Calculate balls faced (exclude wides)
+    balls = session.query(
+        func.count(Delivery.id)
+    ).filter(
+        Delivery.batter == batter,
+        Delivery.bowler == bowler,
+        Delivery.extra_type.is_(None) | (Delivery.extra_type != "wides")
+    ).scalar() or 0
+
+    runs = int(matchup_agg.runs or 0)
+    dismissals = int(matchup_agg.dismissals or 0)
+    fours = int(matchup_agg.fours or 0)
+    sixes = int(matchup_agg.sixes or 0)
+    dots = int(matchup_agg.dots or 0)
+
+    strike_rate = round((runs / balls) * 100, 2) if balls > 0 else 0.0
+
+    # 2. Season-wise Breakdown
+    results = session.query(
+        Match.season,
+        func.sum(Delivery.runs_batter).label("runs"),
+        func.sum(case(
+            (Delivery.extra_type.is_(None) | (Delivery.extra_type != "wides"), 1),
+            else_=0
+        )).label("balls"),
+        func.sum(case(
+            (Delivery.wicket_kind.in_(BOWLER_WICKETS), 1),
+            else_=0
+        )).label("dismissals")
+    ).join(
+        Match, Delivery.match_id == Match.id
+    ).filter(
+        Delivery.batter == batter,
+        Delivery.bowler == bowler
+    ).group_by(
+        Match.season
+    ).order_by(
+        Match.season
+    ).all()
+
+    season_breakdown = [
+        {
+            "season": r.season,
+            "runs": int(r.runs or 0),
+            "balls": int(r.balls or 0),
+            "dismissals": int(r.dismissals or 0),
+            "strike_rate": round((float(r.runs or 0) / float(r.balls or 1)) * 100, 2) if (r.balls or 0) > 0 else 0.0
+        }
+        for r in results
+    ]
+
+    return {
+        "overall": {
+            "batter": batter,
+            "bowler": bowler,
+            "runs": runs,
+            "balls": balls,
+            "dismissals": dismissals,
+            "fours": fours,
+            "sixes": sixes,
+            "dots": dots,
+            "strike_rate": strike_rate
+        },
+        "seasons": season_breakdown
+    }
