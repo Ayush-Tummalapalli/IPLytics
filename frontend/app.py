@@ -186,7 +186,7 @@ def main() -> None:
     # --- Feature Cards ---
     st.markdown("### 📊 Explore Analytics")
 
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
 
     with col1:
         st.markdown("""
@@ -215,9 +215,6 @@ def main() -> None:
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
-    col4, col5, col6 = st.columns(3)
-
     with col4:
         st.markdown("""
         <div class="feature-card">
@@ -226,6 +223,9 @@ def main() -> None:
             <div class="feature-desc">Player vs Player, Team vs Team, Head-to-Head</div>
         </div>
         """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    col5, col6, col7 = st.columns(3)
 
     with col5:
         st.markdown("""
@@ -242,6 +242,15 @@ def main() -> None:
             <div class="feature-icon">💡</div>
             <div class="feature-name">IPL Trivia & Facts</div>
             <div class="feature-desc">25+ dynamic milestones, records, and stats</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col7:
+        st.markdown("""
+        <div class="feature-card">
+            <div class="feature-icon">🏆</div>
+            <div class="feature-name">IPL Leaderboards</div>
+            <div class="feature-desc">Orange/Purple Caps and Top 10 career records</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -288,6 +297,7 @@ def main() -> None:
         - ⚔️ Comparisons
         - 🤖 AI Assistant
         - 💡 IPL Trivia
+        - 🏆 IPL Leaders
         """)
 
         st.divider()

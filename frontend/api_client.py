@@ -118,6 +118,13 @@ def get_ipl_facts() -> dict | None:
     return _get("/analytics/facts")
 
 
+# === Leaderboards & Stats API ===
+
+def get_ipl_leaders() -> dict | None:
+    """Get season-wise caps and career leaderboards from the database."""
+    return _get("/analytics/leaders")
+
+
 # === AI Assistant API ===
 
 def _post(endpoint: str, json_data: dict) -> dict | None:

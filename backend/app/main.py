@@ -27,6 +27,7 @@ from backend.app.routes import (
     comparison_router,
     ai_router,
     facts_router,
+    leaders_router,
 )
 
 # --- Logging Setup ---
@@ -60,6 +61,7 @@ app.include_router(venue_router)
 app.include_router(comparison_router)
 app.include_router(ai_router)
 app.include_router(facts_router)
+app.include_router(leaders_router)
 
 
 # --- Health Check Endpoint ---
