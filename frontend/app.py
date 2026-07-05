@@ -186,7 +186,7 @@ def main() -> None:
     # --- Feature Cards ---
     st.markdown("### 📊 Explore Analytics")
 
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3 = st.columns(3)
 
     with col1:
         st.markdown("""
@@ -215,12 +215,33 @@ def main() -> None:
         </div>
         """, unsafe_allow_html=True)
 
+    st.markdown("<br>", unsafe_allow_html=True)
+    col4, col5, col6 = st.columns(3)
+
     with col4:
         st.markdown("""
         <div class="feature-card">
             <div class="feature-icon">⚔️</div>
             <div class="feature-name">Comparisons</div>
             <div class="feature-desc">Player vs Player, Team vs Team, Head-to-Head</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col5:
+        st.markdown("""
+        <div class="feature-card">
+            <div class="feature-icon">🤖</div>
+            <div class="feature-name">AI Assistant</div>
+            <div class="feature-desc">Google Gemini-powered smart queries and RAG insights</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col6:
+        st.markdown("""
+        <div class="feature-card">
+            <div class="feature-icon">💡</div>
+            <div class="feature-name">IPL Trivia & Facts</div>
+            <div class="feature-desc">25+ dynamic milestones, records, and stats</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -234,9 +255,9 @@ def main() -> None:
     with col1:
         st.info("📅 **18 Seasons** of IPL data (2008–2025)")
     with col2:
-        st.info("📦 **288,226** ball-by-ball deliveries analyzed")
+        st.info("📦 **278,205** ball-by-ball deliveries analyzed")
     with col3:
-        st.info("🤖 **AI-powered** insights coming soon!")
+        st.info("🤖 **AI-powered** RAG assistant using Gemini")
 
     # --- Sidebar ---
     with st.sidebar:
@@ -265,6 +286,8 @@ def main() -> None:
         - 🏆 Team Analytics
         - 🏟️ Venue Analytics
         - ⚔️ Comparisons
+        - 🤖 AI Assistant
+        - 💡 IPL Trivia
         """)
 
         st.divider()
