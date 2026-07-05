@@ -10,6 +10,7 @@ from backend.app.routes.teams import router as team_router
 from backend.app.routes.venues import router as venue_router
 from backend.app.routes.comparisons import router as comparison_router
 from backend.app.routes.ai import router as ai_router
+from backend.app.routes.facts import router as facts_router
 
-__all__ = ["player_router", "team_router", "venue_router", "comparison_router", "ai_router"]
+__all__ = ["player_router", "team_router", "venue_router", "comparison_router", "ai_router", "facts_router"]
 

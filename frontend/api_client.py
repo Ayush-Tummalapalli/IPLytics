@@ -111,6 +111,13 @@ def compare_teams(team1: str, team2: str) -> dict | None:
     return _get("/compare/teams", {"team1": team1, "team2": team2})
 
 
+# === Trivia & Facts API ===
+
+def get_ipl_facts() -> dict | None:
+    """Get dynamic IPL facts and trivia from the database."""
+    return _get("/analytics/facts")
+
+
 # === AI Assistant API ===
 
 def _post(endpoint: str, json_data: dict) -> dict | None:
