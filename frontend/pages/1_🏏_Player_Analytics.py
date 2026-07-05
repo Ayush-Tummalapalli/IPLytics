@@ -180,49 +180,30 @@ def render_season_runs_chart(season_runs: list[dict], player_name: str) -> None:
     st.plotly_chart(fig, use_container_width=True)
 
 
-def render_boundary_chart(batting: dict, player_name: str) -> None:
-    """Plot a grouped bar chart comparing fours and sixes.
-
-    WHY fours vs sixes: This reveals a batsman's scoring style —
-    accumulator (more fours) vs power-hitter (more sixes). A single
-    grouped bar makes the comparison immediately obvious.
-    """
-    fours = batting.get("fours")
-    sixes = batting.get("sixes")
-
-    if fours is None and sixes is None:
-        st.info("No boundary data available for this player.")
+def render_season_wickets_chart(season_wickets: list[dict], player_name: str) -> None:
+    """Plot a bar chart of wickets taken per IPL season."""
+    if not season_wickets or sum(w.get("wickets", 0) for w in season_wickets) == 0:
+        st.info("No season-wise wicket data available for this player.")
         return
 
-    fours = fours or 0
-    sixes = sixes or 0
+    df = pd.DataFrame(season_wickets)
+    df["season"] = df["season"].astype(str)
 
-    fig = go.Figure(
-        data=[
-            go.Bar(
-                name="Fours",
-                x=["Boundaries"],
-                y=[fours],
-                marker_color=COLOR_BATTING,
-                text=[fours],
-                textposition="outside",
-            ),
-            go.Bar(
-                name="Sixes",
-                x=["Boundaries"],
-                y=[sixes],
-                marker_color=COLOR_GOLD,
-                text=[sixes],
-                textposition="outside",
-            ),
-        ]
-    )
-    fig.update_layout(
-        title=f"Fours vs Sixes — {player_name}",
-        barmode="group",
+    fig = px.bar(
+        df,
+        x="season",
+        y="wickets",
+        text="wickets",
+        title=f"Season-wise Wickets — {player_name}",
+        labels={"season": "Season", "wickets": "Wickets Taken"},
         template="plotly_dark",
-        yaxis_title="Count",
-        showlegend=True,
+        color_discrete_sequence=["#b085f5"],
+    )
+    fig.update_traces(textposition="outside")
+    fig.update_layout(
+        xaxis_title="Season",
+        yaxis_title="Wickets",
+        showlegend=False,
         margin=dict(t=60, b=40),
     )
     st.plotly_chart(fig, use_container_width=True)
@@ -282,6 +263,7 @@ def main() -> None:
     batting: dict = stats.get("batting", {})
     bowling: dict = stats.get("bowling", {})
     season_runs: list[dict] = stats.get("season_runs", [])
+    season_wickets: list[dict] = stats.get("season_wickets", [])
 
     # ── Metric cards ──
     render_batting_metrics(batting)
@@ -290,15 +272,13 @@ def main() -> None:
     st.divider()
 
     # ── Charts side-by-side ──
-    # Two columns keep the page compact: season trend on the left,
-    # boundary breakdown on the right.
-    col_season, col_boundary = st.columns(2)
+    col_season_runs, col_season_wkts = st.columns(2)
 
-    with col_season:
+    with col_season_runs:
         render_season_runs_chart(season_runs, selected_player)
 
-    with col_boundary:
-        render_boundary_chart(batting, selected_player)
+    with col_season_wkts:
+        render_season_wickets_chart(season_wickets, selected_player)
 
 
 main()

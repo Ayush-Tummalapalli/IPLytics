@@ -17,6 +17,7 @@ from backend.app.analytics.player_analytics import (
     get_player_batting_stats,
     get_player_bowling_stats,
     get_player_season_runs,
+    get_player_season_wickets,
     search_players,
     get_player_teams,
 )
@@ -74,6 +75,9 @@ def get_player(
     # Get season-wise runs
     season_runs = get_player_season_runs(db, name)
 
+    # Get season-wise wickets
+    season_wickets = get_player_season_wickets(db, name)
+
     # Get player teams
     teams = get_player_teams(db, name)
 
@@ -81,5 +85,6 @@ def get_player(
         "batting": batting,
         "bowling": bowling,
         "season_runs": season_runs,
+        "season_wickets": season_wickets,
         "teams": teams,
     }

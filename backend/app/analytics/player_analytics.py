@@ -322,3 +322,33 @@ def get_player_teams(session: Session, player_name: str) -> list[str]:
     # Combine all query results using union and sort
     all_teams = batting_teams.union(bowling_teams).union(fielding_teams).all()
     return sorted([t[0] for t in all_teams])
+
+
+def get_player_season_wickets(session: Session, player_name: str) -> list[dict]:
+    """
+    Get season-wise wicket totals for a player.
+    
+    Returns a list of {"season": 2023, "wickets": 15}
+    """
+    BOWLER_WICKETS = ["bowled", "caught", "caught and bowled", "hit wicket", "lbw", "stumped"]
+    
+    results = session.query(
+        Match.season,
+        func.sum(case(
+            (Delivery.wicket_kind.in_(BOWLER_WICKETS), 1),
+            else_=0,
+        )).label("wickets")
+    ).join(
+        Match, Delivery.match_id == Match.id,
+    ).filter(
+        Delivery.bowler == player_name,
+    ).group_by(
+        Match.season,
+    ).order_by(
+        Match.season,
+    ).all()
+    
+    return [
+        {"season": r.season, "wickets": int(r.wickets) if r.wickets else 0}
+        for r in results
+    ]
