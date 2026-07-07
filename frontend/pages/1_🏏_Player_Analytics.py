@@ -229,6 +229,12 @@ def render_season_wickets_chart(season_wickets: list[dict], player_name: str, ha
 def main() -> None:
     """Orchestrate the entire Player Analytics page."""
 
+    # ── Sidebar Branding ──
+    with st.sidebar:
+        st.markdown("### 🏏 IPLytics")
+        st.caption("Player Analytics")
+        st.divider()
+
     # ── Header ──
     st.title("🏏 Player Analytics")
     st.caption("Deep-dive into any IPL player's career stats and trends.")
@@ -282,6 +288,62 @@ def main() -> None:
 
     has_batted = batting.get("matches", 0) > 0
     has_bowled = bowling.get("matches", 0) > 0
+
+    # ── Sidebar Dynamic Profile & suggestions ──
+    with st.sidebar:
+        # Determine player role
+        if has_batted and has_bowled:
+            role = "🏏 All-Rounder"
+        elif has_batted:
+            role = "🏏 Batsman"
+        elif has_bowled:
+            role = "🎳 Bowler"
+        else:
+            role = "Unknown"
+            
+        abbrev_map = {
+            "Chennai Super Kings": "CSK",
+            "Mumbai Indians": "MI",
+            "Royal Challengers Bengaluru": "RCB",
+            "Royal Challengers Bangalore": "RCB",
+            "Kolkata Knight Riders": "KKR",
+            "Sunrisers Hyderabad": "SRH",
+            "Delhi Capitals": "DC",
+            "Delhi Daredevils": "DD",
+            "Rajasthan Royals": "RR",
+            "Punjab Kings": "PBKS",
+            "Kings XI Punjab": "KXIP",
+            "Gujarat Titans": "GT",
+            "Lucknow Super Giants": "LSG",
+            "Deccan Chargers": "DCG",
+            "Kochi Tuskers Kerala": "KTK",
+            "Pune Warriors": "PWI",
+            "Rising Pune Supergiant": "RPS",
+            "Rising Pune Supergiants": "RPS",
+            "Gujarat Lions": "GL"
+        }
+        short_teams = [abbrev_map.get(t, t) for t in player_teams]
+        
+        st.markdown("#### 👤 Player Profile Summary")
+        st.markdown(f"""
+        <div style="background: rgba(26, 26, 46, 0.4); border: 1px solid rgba(233, 69, 96, 0.15); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            <h5 style="margin: 0 0 0.5rem 0; color: #f5a623; font-size: 1.1rem; font-weight: 700;">{selected_player}</h5>
+            <div style="font-size: 0.9rem; color: #ccd6f6; margin-bottom: 0.4rem;">🎭 Role: <strong>{role}</strong></div>
+            <div style="font-size: 0.9rem; color: #ccd6f6; margin-bottom: 0.4rem;">🏟️ Teams: <strong>{", ".join(short_teams[:3]) if short_teams else "None"}</strong></div>
+            <div style="font-size: 0.9rem; color: #ccd6f6; margin-bottom: 0.4rem;">🏏 Career Runs: <strong>{batting.get("total_runs", 0):,}</strong></div>
+            <div style="font-size: 0.9rem; color: #ccd6f6;">🎳 Career Wkts: <strong>{bowling.get("wickets", 0)}</strong></div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.divider()
+        st.markdown("#### 🌟 Notable Suggestions")
+        st.caption("Try searching these legends:")
+        st.markdown("""
+        * **Virat Kohli** (Most Runs)
+        * **Yuzvendra Chahal** (Most Wickets)
+        * **MS Dhoni** (Most Dismissals)
+        * **Jasprit Bumrah** (Bowling Economy)
+        """)
 
     # ── Metric cards ──
     render_batting_metrics(batting)
