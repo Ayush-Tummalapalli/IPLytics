@@ -148,7 +148,7 @@ with st.sidebar:
     championships = {
         "Chennai Super Kings": 5, "Mumbai Indians": 5, "Kolkata Knight Riders": 3,
         "Rajasthan Royals": 1, "Deccan Chargers": 1, "Sunrisers Hyderabad": 1,
-        "Gujarat Titans": 1
+        "Gujarat Titans": 1, "Royal Challengers Bengaluru": 1, "Royal Challengers Bangalore": 1
     }
     titles = championships.get(selected_team, 0)
     titles_str = f"🏆 {titles} Titles" if titles > 0 else "❌ No Titles"
