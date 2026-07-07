@@ -15,7 +15,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-from frontend.api_client import get_ipl_leaders
+from frontend.api_client import get_ipl_leaders, get_ipl_champions
 
 # --- Page Config ---
 st.set_page_config(
@@ -27,6 +27,11 @@ st.set_page_config(
 # --- Custom CSS for Styling ---
 st.markdown("""
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+    
+    html, body, [class*="css"], .stApp, * {
+        font-family: 'Outfit', sans-serif !important;
+    }
     .stApp {
         background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
     }
@@ -118,6 +123,48 @@ st.markdown("""
         padding: 1.5rem;
         margin-bottom: 2rem;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Timeline Dashboard Grid and Card Styles */
+    .timeline-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+    .timeline-card {
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        border: 1px solid rgba(233, 69, 96, 0.15);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+        position: relative;
+    }
+    .timeline-card:hover {
+        transform: translateY(-5px);
+        border-color: #f5a62380;
+        box-shadow: 0 12px 30px rgba(245, 166, 35, 0.2);
+    }
+    .timeline-year {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #f5a623;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+    }
+    .timeline-team {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #ccd6f6;
+        margin-bottom: 0.5rem;
+    }
+    .timeline-detail {
+        font-size: 0.9rem;
+        color: #8892b0;
+    }
+    .timeline-detail strong {
+        color: #00bcd4;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -327,8 +374,9 @@ def render_bowling_avg_table(data_list):
     return clean_html(table_html)
 
 # Tabs layout
-tab_caps, tab_batting, tab_bowling = st.tabs([
+tab_caps, tab_champions, tab_batting, tab_bowling = st.tabs([
     "🥇 Season Caps",
+    "🏆 Tournament Champions",
     "🏏 Batting Leaders",
     "🥎 Bowling Leaders"
 ])
@@ -354,6 +402,50 @@ with tab_caps:
             st.markdown(render_caps_table("purple", purple_list), unsafe_allow_html=True)
         else:
             st.info("No Purple Cap data available.")
+
+with tab_champions:
+    st.markdown("<h3 style='margin-top: 1rem; color: #ccd6f6;'>Tournament Champions Timeline</h3>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #8892b0; margin-bottom: 2rem;'>Chronological timeline of all IPL winning franchises, final match locations, and key MVP match winners.</p>", unsafe_allow_html=True)
+
+    with st.spinner("Loading champions timeline..."):
+        champions_list = get_ipl_champions()
+
+    if not champions_list:
+        st.info("No tournament champions data available.")
+    else:
+        cards_html = ""
+        for item in champions_list:
+            season = item["season"]
+            champion = item["champion"]
+            short_name = item["short_name"]
+            pom = item["player_of_match"] or "N/A"
+            venue = item["venue"] or "N/A"
+            city = item["city"] or "N/A"
+            
+            logo_mapping = {
+                "CSK": "🦁", "MI": "⚡", "RCB": "🦅", "KKR": "🛡️", "SRH": "🦅",
+                "DC": "🐯", "RR": "👑", "PBKS": "🦁", "GT": "⚡", "LSG": "🦅",
+                "DEC": "🛡️"
+            }
+            icon = logo_mapping.get(short_name, "🏆")
+
+            cards_html += f"""
+            <div class="timeline-card">
+                <div class="timeline-year">{season}</div>
+                <div class="timeline-team">{icon} {champion} ({short_name})</div>
+                <div class="timeline-detail">👤 Player of the Match: <strong>{pom}</strong></div>
+                <div class="timeline-detail">📍 Venue: <strong>{venue} ({city})</strong></div>
+            </div>
+            """
+            
+        # Clear HTML and wrap inside timeline grid
+        def clean_timeline_html(html_str: str) -> str:
+            html_str = html_str.replace("\r", "").replace("\n", "")
+            while "  " in html_str:
+                html_str = html_str.replace("  ", " ")
+            return html_str.strip()
+
+        st.markdown(clean_timeline_html(f'<div class="timeline-grid">{cards_html}</div>'), unsafe_allow_html=True)
 
 with tab_batting:
     st.markdown("<h3 style='margin-top: 1rem; color: #ccd6f6;'>All-Time Batting Leaderboards</h3>", unsafe_allow_html=True)

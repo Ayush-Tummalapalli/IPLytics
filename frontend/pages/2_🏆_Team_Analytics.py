@@ -24,10 +24,21 @@ st.set_page_config(
 # --- Custom CSS ---
 st.markdown("""
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+    
+    html, body, [class*="css"], .stApp, * {
+        font-family: 'Outfit', sans-serif !important;
+    }
     .stApp { background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%); }
     div[data-testid="stMetric"] {
         background: linear-gradient(135deg, #1a1a2e, #16213e);
         border: 1px solid #e9456030; border-radius: 12px; padding: 1rem;
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    div[data-testid="stMetric"]:hover {
+        transform: translateY(-5px);
+        border-color: #e9456080;
+        box-shadow: 0 12px 30px rgba(233, 69, 96, 0.25);
     }
     div[data-testid="stMetric"] label { color: #8892b0 !important; }
     div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
@@ -38,6 +49,28 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
+TEAM_COLORS = {
+    "Chennai Super Kings": {"bg": "linear-gradient(135deg, #FFF9C4 0%, #FBC02D 100%)", "border": "#FFD700", "text": "#002F6C", "glow": "rgba(255, 215, 0, 0.4)"},
+    "Mumbai Indians": {"bg": "linear-gradient(135deg, #1A237E 0%, #0D47A1 100%)", "border": "#00D4FF", "text": "#FFFFFF", "glow": "rgba(0, 212, 255, 0.3)"},
+    "Royal Challengers Bengaluru": {"bg": "linear-gradient(135deg, #1A1A1A 0%, #2D0000 100%)", "border": "#E94560", "text": "#FFFFFF", "glow": "rgba(233, 69, 96, 0.4)"},
+    "Royal Challengers Bangalore": {"bg": "linear-gradient(135deg, #1A1A1A 0%, #2D0000 100%)", "border": "#E94560", "text": "#FFFFFF", "glow": "rgba(233, 69, 96, 0.4)"},
+    "Kolkata Knight Riders": {"bg": "linear-gradient(135deg, #311B92 0%, #1A237E 100%)", "border": "#FFD700", "text": "#FFFFFF", "glow": "rgba(255, 215, 0, 0.3)"},
+    "Sunrisers Hyderabad": {"bg": "linear-gradient(135deg, #FF6F00 0%, #E65100 100%)", "border": "#000000", "text": "#FFFFFF", "glow": "rgba(255, 111, 0, 0.4)"},
+    "Delhi Capitals": {"bg": "linear-gradient(135deg, #0D47A1 0%, #D50000 100%)", "border": "#FFFFFF", "text": "#FFFFFF", "glow": "rgba(255, 255, 255, 0.3)"},
+    "Delhi Daredevils": {"bg": "linear-gradient(135deg, #0D47A1 0%, #D50000 100%)", "border": "#FFFFFF", "text": "#FFFFFF", "glow": "rgba(255, 255, 255, 0.3)"},
+    "Rajasthan Royals": {"bg": "linear-gradient(135deg, #C2185B 0%, #0D47A1 100%)", "border": "#00D4FF", "text": "#FFFFFF", "glow": "rgba(0, 212, 255, 0.4)"},
+    "Punjab Kings": {"bg": "linear-gradient(135deg, #D50000 0%, #B71C1C 100%)", "border": "#FFD700", "text": "#FFFFFF", "glow": "rgba(255, 215, 0, 0.4)"},
+    "Kings XI Punjab": {"bg": "linear-gradient(135deg, #D50000 0%, #B71C1C 100%)", "border": "#FFD700", "text": "#FFFFFF", "glow": "rgba(255, 215, 0, 0.4)"},
+    "Gujarat Titans": {"bg": "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)", "border": "#D4AF37", "text": "#FFFFFF", "glow": "rgba(212, 175, 55, 0.3)"},
+    "Lucknow Super Giants": {"bg": "linear-gradient(135deg, #E0F7FA 0%, #80DEEA 100%)", "border": "#FFB300", "text": "#0D47A1", "glow": "rgba(255, 179, 0, 0.4)"},
+    "Deccan Chargers": {"bg": "linear-gradient(135deg, #263238 0%, #37474F 100%)", "border": "#CFD8DC", "text": "#FFFFFF", "glow": "rgba(207, 216, 220, 0.3)"},
+    "Kochi Tuskers Kerala": {"bg": "linear-gradient(135deg, #FF6F00 0%, #7B1FA2 100%)", "border": "#FFFFFF", "text": "#FFFFFF", "glow": "rgba(255, 255, 255, 0.3)"},
+    "Pune Warriors": {"bg": "linear-gradient(135deg, #37474F 0%, #455A64 100%)", "border": "#00E5FF", "text": "#FFFFFF", "glow": "rgba(0, 229, 255, 0.3)"},
+    "Rising Pune Supergiant": {"bg": "linear-gradient(135deg, #8E24AA 0%, #D81B60 100%)", "border": "#FFD700", "text": "#FFFFFF", "glow": "rgba(255, 215, 0, 0.3)"},
+    "Rising Pune Supergiants": {"bg": "linear-gradient(135deg, #8E24AA 0%, #D81B60 100%)", "border": "#FFD700", "text": "#FFFFFF", "glow": "rgba(255, 215, 0, 0.3)"},
+    "Gujarat Lions": {"bg": "linear-gradient(135deg, #FF6F00 0%, #FFB300 100%)", "border": "#D50000", "text": "#D50000", "glow": "rgba(213, 0, 0, 0.3)"},
+}
 
 COLOR_PRIMARY = "#e94560"
 COLOR_SECONDARY = "#0f3460"
@@ -78,6 +111,26 @@ selected_idx = st.selectbox(
     index=team_names.index("Mumbai Indians") if "Mumbai Indians" in team_names else 0,
 )
 selected_team = team_names[selected_idx]
+
+# Inject dynamic team branding colors
+colors = TEAM_COLORS.get(selected_team, {"bg": "linear-gradient(135deg, #1a1a2e, #16213e)", "border": "#e9456030", "text": "#e94560", "glow": "rgba(233, 69, 96, 0.1)"})
+st.markdown(f"""
+<style>
+    div[data-testid="stMetric"] {{
+        background: {colors['bg']} !important;
+        border: 1px solid {colors['border']}80 !important;
+        box-shadow: 0 4px 15px {colors['glow']} !important;
+    }}
+    div[data-testid="stMetric"]:hover {{
+        transform: translateY(-5px);
+        border-color: {colors['border']} !important;
+        box-shadow: 0 12px 30px {colors['glow']} !important;
+    }}
+    div[data-testid="stMetric"] div[data-testid="stMetricValue"] {{
+        color: {colors['text']} !important;
+    }}
+</style>
+""", unsafe_allow_html=True)
 
 data = fetch_team_stats(selected_team)
 if not data:

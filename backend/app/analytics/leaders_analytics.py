@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from backend.app.models.delivery import Delivery
 from backend.app.models.match import Match
+from backend.app.models.team import Team
 
 logger = logging.getLogger(__name__)
 
@@ -218,3 +219,50 @@ def get_ipl_leaders(session: Session) -> dict:
             "bowling_average": top_bowling_avg
         }
     }
+
+
+def get_season_champions(session: Session) -> list[dict]:
+    """
+    Get the tournament champions for each season from 2008 to 2025.
+    
+    Identified by the winning team of the final match of each season.
+    """
+    logger.info("Computing dynamically calculated season champions timeline...")
+    
+    # Subquery to find the date of the final (last match date) for each season
+    subq = (
+        session.query(
+            Match.season,
+            func.max(Match.date).label("max_date")
+        )
+        .group_by(Match.season)
+        .subquery()
+    )
+    
+    # Query details of the final match and its winner
+    finals = (
+        session.query(
+            Match.season,
+            Team.name,
+            Team.short_name,
+            Match.player_of_match,
+            Match.venue,
+            Match.city
+        )
+        .join(subq, and_(Match.season == subq.c.season, Match.date == subq.c.max_date))
+        .join(Team, Match.winner_id == Team.id)
+        .order_by(Match.season.desc())
+        .all()
+    )
+    
+    champions = []
+    for row in finals:
+        champions.append({
+            "season": int(row.season),
+            "champion": row.name,
+            "short_name": row.short_name,
+            "player_of_match": row.player_of_match,
+            "venue": row.venue,
+            "city": row.city
+        })
+    return champions

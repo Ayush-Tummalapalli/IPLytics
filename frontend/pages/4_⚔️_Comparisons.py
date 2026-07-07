@@ -31,10 +31,21 @@ st.set_page_config(
 # --- Custom CSS ---
 st.markdown("""
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+    
+    html, body, [class*="css"], .stApp, * {
+        font-family: 'Outfit', sans-serif !important;
+    }
     .stApp { background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%); }
     div[data-testid="stMetric"] {
         background: linear-gradient(135deg, #1a1a2e, #16213e);
         border: 1px solid #e9456030; border-radius: 12px; padding: 1rem;
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    div[data-testid="stMetric"]:hover {
+        transform: translateY(-5px);
+        border-color: #e9456080;
+        box-shadow: 0 12px 30px rgba(233, 69, 96, 0.25);
     }
     div[data-testid="stMetric"] label { color: #8892b0 !important; }
     div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
@@ -107,8 +118,193 @@ st.markdown("""
         border: 1px solid rgba(176, 133, 245, 0.3);
         display: inline-block;
     }
+
+    /* Premium Team Comparisons Cards styling */
+    .team-card {
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: center;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    .team-card:hover {
+        transform: translateY(-4px);
+    }
+    .team-card-label {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.25rem;
+        font-weight: 500;
+    }
+    .team-card-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+    }
+    
+    .team-default {
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        border: 1px solid #e9456030;
+        box-shadow: 0 4px 15px rgba(233, 69, 96, 0.1);
+    }
+    .team-default:hover {
+        border-color: #e9456080;
+        box-shadow: 0 12px 30px rgba(233, 69, 96, 0.25);
+    }
+    .team-default .team-card-label { color: #8892b0; }
+    .team-default .team-card-value { color: #e94560; }
+    
+    /* CSK */
+    .team-CSK {
+        background: linear-gradient(135deg, #FFF9C4 0%, #FBC02D 100%);
+        border: 1px solid #FFD70080;
+        box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+    }
+    .team-CSK:hover {
+        border-color: #FFD700;
+        box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+    }
+    .team-CSK .team-card-label { color: #002F6C80; }
+    .team-CSK .team-card-value { color: #002F6C; }
+    
+    /* MI */
+    .team-MI {
+        background: linear-gradient(135deg, #1A237E 0%, #0D47A1 100%);
+        border: 1px solid #00D4FF80;
+        box-shadow: 0 4px 15px rgba(0, 212, 255, 0.2);
+    }
+    .team-MI:hover {
+        border-color: #00D4FF;
+        box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
+    }
+    .team-MI .team-card-label { color: #8892b0; }
+    .team-MI .team-card-value { color: #FFFFFF; }
+    
+    /* RCB */
+    .team-RCB {
+        background: linear-gradient(135deg, #1A1A1A 0%, #2D0000 100%);
+        border: 1px solid #E9456080;
+        box-shadow: 0 4px 15px rgba(233, 69, 96, 0.2);
+    }
+    .team-RCB:hover {
+        border-color: #E94560;
+        box-shadow: 0 8px 25px rgba(233, 69, 96, 0.4);
+    }
+    .team-RCB .team-card-label { color: #8892b0; }
+    .team-RCB .team-card-value { color: #FFFFFF; }
+
+    /* KKR */
+    .team-KKR {
+        background: linear-gradient(135deg, #311B92 0%, #1A237E 100%);
+        border: 1px solid #FFD70080;
+        box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+    }
+    .team-KKR:hover {
+        border-color: #FFD700;
+        box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+    }
+    .team-KKR .team-card-label { color: #8892b0; }
+    .team-KKR .team-card-value { color: #FFFFFF; }
+
+    /* SRH */
+    .team-SRH {
+        background: linear-gradient(135deg, #FF6F00 0%, #E65100 100%);
+        border: 1px solid #00000080;
+        box-shadow: 0 4px 15px rgba(255, 111, 0, 0.2);
+    }
+    .team-SRH:hover {
+        border-color: #000000;
+        box-shadow: 0 8px 25px rgba(255, 111, 0, 0.4);
+    }
+    .team-SRH .team-card-label { color: #8892b0; }
+    .team-SRH .team-card-value { color: #FFFFFF; }
+
+    /* DC */
+    .team-DC {
+        background: linear-gradient(135deg, #0D47A1 0%, #D50000 100%);
+        border: 1px solid #FFFFFF80;
+        box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+    }
+    .team-DC:hover {
+        border-color: #FFFFFF;
+        box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+    }
+    .team-DC .team-card-label { color: #8892b0; }
+    .team-DC .team-card-value { color: #FFFFFF; }
+
+    /* RR */
+    .team-RR {
+        background: linear-gradient(135deg, #C2185B 0%, #0D47A1 100%);
+        border: 1px solid #00D4FF80;
+        box-shadow: 0 4px 15px rgba(0, 212, 255, 0.2);
+    }
+    .team-RR:hover {
+        border-color: #00D4FF;
+        box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
+    }
+    .team-RR .team-card-label { color: #8892b0; }
+    .team-RR .team-card-value { color: #FFFFFF; }
+
+    /* PBKS */
+    .team-PBKS {
+        background: linear-gradient(135deg, #D50000 0%, #B71C1C 100%);
+        border: 1px solid #FFD70080;
+        box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+    }
+    .team-PBKS:hover {
+        border-color: #FFD700;
+        box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+    }
+    .team-PBKS .team-card-label { color: #8892b0; }
+    .team-PBKS .team-card-value { color: #FFFFFF; }
+
+    /* GT */
+    .team-GT {
+        background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+        border: 1px solid #D4AF3780;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1);
+    }
+    .team-GT:hover {
+        border-color: #D4AF37;
+        box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+    }
+    .team-GT .team-card-label { color: #8892b0; }
+    .team-GT .team-card-value { color: #FFFFFF; }
+
+    /* LSG */
+    .team-LSG {
+        background: linear-gradient(135deg, #E0F7FA 0%, #80DEEA 100%);
+        border: 1px solid #FFB30080;
+        box-shadow: 0 4px 15px rgba(255, 179, 0, 0.2);
+    }
+    .team-LSG:hover {
+        border-color: #FFB300;
+        box-shadow: 0 8px 25px rgba(255, 179, 0, 0.4);
+    }
+    .team-LSG .team-card-label { color: #0D47A180; }
+    .team-LSG .team-card-value { color: #0D47A1; }
 </style>
 """, unsafe_allow_html=True)
+
+def render_team_metric_card(label: str, value: str, short_name: str) -> str:
+    clean_short = short_name.upper().replace(" ", "")
+    class_name = f"team-{clean_short}"
+    supported = ["CSK", "MI", "RCB", "KKR", "SRH", "DC", "RR", "PBKS", "GT", "LSG"]
+    if clean_short not in supported:
+        class_name = "team-default"
+    return f"""
+    <div class="team-card {class_name}">
+        <div class="team-card-label">{label}</div>
+        <div class="team-card-value">{value}</div>
+    </div>
+    """
+
+def clean_html(html_str: str) -> str:
+    html_str = html_str.replace("\r", "").replace("\n", "")
+    while "  " in html_str:
+        html_str = html_str.replace("  ", " ")
+    return html_str.strip()
 
 COLOR_P1 = "#e94560"
 COLOR_P2 = "#0f3460"
@@ -450,7 +646,7 @@ with tab2:
                         with row[j]:
                             val = s1[key]
                             display = f"{val}%" if key == "win_percentage" else f"{val}"
-                            st.metric(label, display)
+                            st.markdown(clean_html(render_team_metric_card(label, display, s1['short_name'])), unsafe_allow_html=True)
                 with col_mid:
                     st.write("")
                 with col_right:
@@ -460,7 +656,7 @@ with tab2:
                         with row[j]:
                             val = s2[key]
                             display = f"{val}%" if key == "win_percentage" else f"{val}"
-                            st.metric(label, display)
+                            st.markdown(clean_html(render_team_metric_card(label, display, s2['short_name'])), unsafe_allow_html=True)
 
         elif t1_name == t2_name:
             st.info("Please select two different teams to compare.")

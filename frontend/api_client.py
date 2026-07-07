@@ -130,6 +130,11 @@ def get_ipl_leaders() -> dict | None:
     return _get("/analytics/leaders")
 
 
+def get_ipl_champions() -> list[dict] | None:
+    """Get season-wise champions timeline from the database."""
+    return _get("/analytics/leaders/champions")
+
+
 # === AI Assistant API ===
 
 def _post(endpoint: str, json_data: dict) -> dict | None:

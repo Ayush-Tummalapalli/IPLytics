@@ -12,8 +12,18 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 from frontend.api_client import ask_ai
+
+def render_lottie(url: str, height: int = 180) -> None:
+    lottie_html = f"""
+    <div style="display: flex; justify-content: center; align-items: center; height: {height}px; width: 100%;">
+        <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+        <lottie-player src="{url}" background="transparent" speed="1" style="width: {height}px; height: {height}px;" loop autoplay></lottie-player>
+    </div>
+    """
+    components.html(lottie_html, height=height)
 
 # --- Page Config ---
 st.set_page_config(
@@ -25,6 +35,11 @@ st.set_page_config(
 # --- Custom CSS for Chat Interface ---
 st.markdown("""
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+    
+    html, body, [class*="css"], .stApp, * {
+        font-family: 'Outfit', sans-serif !important;
+    }
     .stApp {
         background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
     }
@@ -113,13 +128,16 @@ suggested_questions = [
 
 # Display suggestions if no chat history
 if not st.session_state.messages:
-    st.subheader("💡 Try asking one of these:")
-    
-    cols = st.columns(2)
-    for idx, q in enumerate(suggested_questions):
-        col = cols[idx % 2]
-        if col.button(q, key=f"suggest_{idx}"):
-            st.session_state.messages.append({"role": "user", "content": q})
+    col_lottie, col_sug = st.columns([1, 2.5])
+    with col_lottie:
+        render_lottie("https://assets5.lottiefiles.com/packages/lf20_enlitd9r.json", height=200)
+    with col_sug:
+        st.subheader("💡 Try asking one of these:")
+        cols = st.columns(2)
+        for idx, q in enumerate(suggested_questions):
+            col = cols[idx % 2]
+            if col.button(q, key=f"suggest_{idx}"):
+                st.session_state.messages.append({"role": "user", "content": q})
             
             # Show the spinner and invoke API
             with st.spinner("🔍 IPLytics AI is analyzing database stats..."):

@@ -26,6 +26,11 @@ st.set_page_config(
 # --- Custom CSS for Styling ---
 st.markdown("""
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+    
+    html, body, [class*="css"], .stApp, * {
+        font-family: 'Outfit', sans-serif !important;
+    }
     .stApp {
         background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
     }
@@ -42,11 +47,12 @@ st.markdown("""
         padding: 1.25rem;
         text-align: center;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        transition: transform 0.3s ease, border-color 0.3s ease;
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease, border-color 0.3s ease;
     }
     .metric-card:hover {
-        transform: translateY(-3px);
-        border-color: rgba(233, 69, 96, 0.4);
+        transform: translateY(-5px);
+        border-color: rgba(233, 69, 96, 0.5);
+        box-shadow: 0 12px 30px rgba(233, 69, 96, 0.25);
     }
     .metric-val {
         font-size: 2rem;

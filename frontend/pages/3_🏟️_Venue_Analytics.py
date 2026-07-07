@@ -24,10 +24,21 @@ st.set_page_config(
 # --- Custom CSS ---
 st.markdown("""
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+    
+    html, body, [class*="css"], .stApp, * {
+        font-family: 'Outfit', sans-serif !important;
+    }
     .stApp { background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%); }
     div[data-testid="stMetric"] {
         background: linear-gradient(135deg, #1a1a2e, #16213e);
         border: 1px solid #e9456030; border-radius: 12px; padding: 1rem;
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    div[data-testid="stMetric"]:hover {
+        transform: translateY(-5px);
+        border-color: #e9456080;
+        box-shadow: 0 12px 30px rgba(233, 69, 96, 0.25);
     }
     div[data-testid="stMetric"] label { color: #8892b0 !important; }
     div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
