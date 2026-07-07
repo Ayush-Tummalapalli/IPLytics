@@ -291,15 +291,19 @@ def main() -> None:
 
     # ── Sidebar Dynamic Profile & suggestions ──
     with st.sidebar:
-        # Determine player role
-        if has_batted and has_bowled:
+        # Determine player role dynamically using career stats and stumping records
+        is_wk = stats.get("is_wicketkeeper", False)
+        runs = batting.get("total_runs", 0) or 0
+        wickets = bowling.get("wickets", 0) or 0
+        
+        if is_wk:
+            role = "🧤 Wicket-Keeper Batsman"
+        elif runs >= 500 and wickets >= 15 and runs <= wickets * 120:
             role = "🏏 All-Rounder"
-        elif has_batted:
-            role = "🏏 Batsman"
-        elif has_bowled:
+        elif wickets >= 10 or (wickets >= 1 and runs < 100):
             role = "🎳 Bowler"
         else:
-            role = "Unknown"
+            role = "🏏 Batsman"
             
         abbrev_map = {
             "Chennai Super Kings": "CSK",

@@ -9,9 +9,11 @@ Endpoints:
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from backend.app.database.connection import get_db
+from backend.app.models.delivery import Delivery
 from backend.app.analytics.player_analytics import (
     get_all_players,
     get_player_batting_stats,
@@ -81,10 +83,18 @@ def get_player(
     # Get player teams
     teams = get_player_teams(db, name)
 
+    # Check stumpings in career to dynamically identify wicket-keepers
+    stumpings = db.query(func.count(Delivery.id)).filter(
+        Delivery.fielder == name,
+        Delivery.dismissal_kind == "stumped"
+    ).scalar() or 0
+    is_wicketkeeper = stumpings >= 1
+
     return {
         "batting": batting,
         "bowling": bowling,
         "season_runs": season_runs,
         "season_wickets": season_wickets,
         "teams": teams,
+        "is_wicketkeeper": is_wicketkeeper,
     }
