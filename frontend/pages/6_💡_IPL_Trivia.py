@@ -353,19 +353,4 @@ with tab3:
             description="Total matches ending in a tie score, triggering a Super Over to decide the final winner."
         )
         
-        # Add a custom chart showing Bat-first vs Chase wins ratio
-        fig2 = go.Figure(data=[go.Pie(
-            labels=['Chasing Wins', 'Bat First Wins'],
-            values=[records.get('chase_ratio', 0.0), records.get('bat_first_ratio', 0.0)],
-            hole=.4,
-            marker_colors=['#00bcd4', '#e94560']
-        )])
-        fig2.update_layout(
-            title="Overall Tournament Win Method Split",
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)',
-            font=dict(color='#8892b0'),
-            height=220,
-            margin=dict(t=40, b=0, l=0, r=0)
-        )
-        st.plotly_chart(fig2, use_container_width=True)
+
