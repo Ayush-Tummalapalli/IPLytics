@@ -98,6 +98,42 @@ if selected:
 
     stats = data["stats"]
 
+    # ── Sidebar dynamic profile card ──
+    with st.sidebar:
+        venue_franchises = {
+            "Wankhede Stadium": "⚡ Mumbai Indians",
+            "MA Chidambaram Stadium": "🦁 Chennai Super Kings",
+            "M Chinnaswamy Stadium": "🦅 Royal Challengers Bengaluru",
+            "M.Chinnaswamy Stadium": "🦅 Royal Challengers Bengaluru",
+            "Eden Gardens": "🛡️ Kolkata Knight Riders",
+            "Rajiv Gandhi International Stadium": "🦅 Sunrisers Hyderabad",
+            "Arun Jaitley Stadium": "🐯 Delhi Capitals",
+            "Feroz Shah Kotla": "🐯 Delhi Capitals",
+            "Sawai Mansingh Stadium": "👑 Rajasthan Royals",
+            "Punjab Cricket Association": "🦁 Punjab Kings",
+            "Narendra Modi Stadium": "⚡ Gujarat Titans",
+            "Ekana Cricket Stadium": "🦅 Lucknow Super Giants",
+            "Ekana Cricket": "🦅 Lucknow Super Giants",
+            "Deccan": "🛡️ Deccan Chargers"
+        }
+        
+        home_team = "Neutral / Multi-Team"
+        for k, v in venue_franchises.items():
+            if k.lower() in stats['venue'].lower():
+                home_team = v
+                break
+                
+        st.markdown("#### 🏟️ Venue Profile Summary")
+        st.markdown(f"""
+        <div style="background: rgba(26, 26, 46, 0.4); border: 1px solid rgba(233, 69, 96, 0.15); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            <h5 style="margin: 0 0 0.5rem 0; color: #f5a623; font-size: 1.1rem; font-weight: 700;">{stats['venue']}</h5>
+            <div style="font-size: 0.9rem; color: #ccd6f6; margin-bottom: 0.4rem;">📍 City: <strong>{stats['city']}</strong></div>
+            <div style="font-size: 0.9rem; color: #ccd6f6; margin-bottom: 0.4rem;">🏠 Home Team: <strong>{home_team}</strong></div>
+            <div style="font-size: 0.9rem; color: #ccd6f6; margin-bottom: 0.4rem;">🏏 Avg 1st Inn Score: <strong>{stats['avg_first_innings_score']}</strong></div>
+            <div style="font-size: 0.9rem; color: #ccd6f6;">🏏 Avg 2nd Inn Score: <strong>{stats['avg_second_innings_score']}</strong></div>
+        </div>
+        """, unsafe_allow_html=True)
+
     st.divider()
 
     # =============================================

@@ -317,6 +317,20 @@ with st.sidebar:
     st.markdown("### 🏏 IPLytics")
     st.caption("Comparisons")
     st.divider()
+    
+    st.markdown("#### ⚔️ Comparison Guide")
+    st.markdown("""
+    <div style="background: rgba(26, 26, 46, 0.4); border: 1px solid rgba(233, 69, 96, 0.15); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        <h6 style="margin: 0 0 0.4rem 0; color: #e94560; font-weight: 700;">🧑 Player Comparison</h6>
+        <p style="font-size: 0.82rem; color: #8892b0; margin-bottom: 0.8rem; line-height: 1.3;">Compare batting averages, strike rates, wickets, and economy metrics side-by-side.</p>
+        
+        <h6 style="margin: 0 0 0.4rem 0; color: #00bcd4; font-weight: 700;">🏆 Team Comparison</h6>
+        <p style="font-size: 0.82rem; color: #8892b0; margin-bottom: 0.8rem; line-height: 1.3;">Analyze head-to-head ratios, season performance trends, and win/loss methods.</p>
+        
+        <h6 style="margin: 0 0 0.4rem 0; color: #f5a623; font-weight: 700;">⚔️ Batter vs Bowler</h6>
+        <p style="font-size: 0.82rem; color: #8892b0; margin-bottom: 0; line-height: 1.3;">Deep-dive into carrier matchups: runs, wickets, strike rate, boundaries, and dot balls.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 @st.cache_data(ttl=300)

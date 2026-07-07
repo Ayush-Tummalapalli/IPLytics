@@ -143,6 +143,45 @@ if not data:
 stats = data["stats"]
 season_perf = data["season_performance"]
 
+# ── Sidebar dynamic profile card ──
+with st.sidebar:
+    championships = {
+        "Chennai Super Kings": 5, "Mumbai Indians": 5, "Kolkata Knight Riders": 3,
+        "Rajasthan Royals": 1, "Deccan Chargers": 1, "Sunrisers Hyderabad": 1,
+        "Gujarat Titans": 1
+    }
+    titles = championships.get(selected_team, 0)
+    titles_str = f"🏆 {titles} Titles" if titles > 0 else "❌ No Titles"
+    
+    home_grounds = {
+        "Chennai Super Kings": "MA Chidambaram Stadium",
+        "Mumbai Indians": "Wankhede Stadium",
+        "Royal Challengers Bengaluru": "M Chinnaswamy Stadium",
+        "Royal Challengers Bangalore": "M Chinnaswamy Stadium",
+        "Kolkata Knight Riders": "Eden Gardens",
+        "Sunrisers Hyderabad": "Rajiv Gandhi Stadium",
+        "Delhi Capitals": "Arun Jaitley Stadium",
+        "Delhi Daredevils": "Feroz Shah Kotla",
+        "Rajasthan Royals": "Sawai Mansingh Stadium",
+        "Punjab Kings": "IS Bindra Stadium",
+        "Kings XI Punjab": "IS Bindra Stadium",
+        "Gujarat Titans": "Narendra Modi Stadium",
+        "Lucknow Super Giants": "BRSABV Ekana Stadium"
+    }
+    home = home_grounds.get(selected_team, "Multiple / Neutral Venues")
+    
+    st.markdown("#### 🏆 Franchise Profile Summary")
+    st.markdown(f"""
+    <div style="background: rgba(26, 26, 46, 0.4); border: 1px solid rgba(233, 69, 96, 0.15); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        <h5 style="margin: 0 0 0.5rem 0; color: #f5a623; font-size: 1.1rem; font-weight: 700;">{selected_team}</h5>
+        <div style="font-size: 0.9rem; color: #ccd6f6; margin-bottom: 0.4rem;">🏅 Titles: <strong>{titles_str}</strong></div>
+        <div style="font-size: 0.9rem; color: #ccd6f6; margin-bottom: 0.4rem;">🏟️ Home Ground: <strong>{home}</strong></div>
+        <div style="font-size: 0.9rem; color: #ccd6f6;">📈 Win %: <strong>{stats['win_percentage']}%</strong></div>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+
 st.divider()
 
 # =============================================
