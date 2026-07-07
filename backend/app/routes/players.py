@@ -86,7 +86,7 @@ def get_player(
     # Check stumpings in career to dynamically identify wicket-keepers
     stumpings = db.query(func.count(Delivery.id)).filter(
         Delivery.fielder == name,
-        Delivery.dismissal_kind == "stumped"
+        Delivery.wicket_kind == "stumped"
     ).scalar() or 0
     is_wicketkeeper = stumpings >= 1
 
