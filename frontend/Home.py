@@ -318,9 +318,6 @@ def main() -> None:
         - 🏆 IPL Leaders
         """)
 
-        st.divider()
-        st.caption("Built with ❤️ using FastAPI + Streamlit + PostgreSQL")
-
 
 if __name__ == "__main__":
     main()

@@ -48,7 +48,7 @@ IPLytics/
 ├── frontend/
 │   ├── pages/               # Streamlit multi-page app pages
 │   ├── components/          # Reusable UI components
-│   └── app.py               # Streamlit entry point
+│   └── Home.py              # Streamlit entry point
 │
 ├── data/
 │   ├── raw/                 # Original Kaggle CSV files
@@ -109,7 +109,7 @@ Visit: [http://localhost:8000/docs](http://localhost:8000/docs) for API document
 ### 6. Start the Frontend
 
 ```bash
-streamlit run frontend/app.py
+streamlit run frontend/Home.py
 ```
 
 Visit: [http://localhost:8501](http://localhost:8501)
@@ -204,7 +204,7 @@ Follow these steps to deploy the production build to the cloud:
 #### Option A: Streamlit Community Cloud (Recommended)
 1. Go to [share.streamlit.io](https://share.streamlit.io) and log in.
 2. Select **Deploy an app** and choose your GitHub repo.
-3. Set **Main file path** to `frontend/app.py`.
+3. Set **Main file path** to `frontend/Home.py`.
 4. In Advanced Settings, add the following **Secret** (or Environment Variable):
    - `BACKEND_URL` = (Your Render backend URL)
 5. Deploy. Streamlit Cloud handles scaling automatically.
