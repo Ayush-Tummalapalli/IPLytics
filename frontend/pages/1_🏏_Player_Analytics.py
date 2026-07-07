@@ -339,15 +339,6 @@ def main() -> None:
         </div>
         """, unsafe_allow_html=True)
         
-        st.divider()
-        st.markdown("#### 🌟 Notable Suggestions")
-        st.caption("Try searching these legends:")
-        st.markdown("""
-        * **Virat Kohli** (Most Runs)
-        * **Yuzvendra Chahal** (Most Wickets)
-        * **MS Dhoni** (Most Dismissals)
-        * **Jasprit Bumrah** (Bowling Economy)
-        """)
 
     # ── Metric cards ──
     render_batting_metrics(batting)
