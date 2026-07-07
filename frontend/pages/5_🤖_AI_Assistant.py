@@ -16,14 +16,50 @@ import streamlit.components.v1 as components
 
 from frontend.api_client import ask_ai
 
-def render_lottie(url: str, height: int = 180) -> None:
-    lottie_html = f"""
-    <div style="display: flex; justify-content: center; align-items: center; height: {height}px; width: 100%;">
-        <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-        <lottie-player src="{url}" background="transparent" speed="1" style="width: {height}px; height: {height}px;" loop autoplay></lottie-player>
+def render_mascot():
+    mascot_html = """
+    <div style="display: flex; justify-content: center; align-items: center; height: 160px; width: 100%; margin-bottom: 1rem;">
+        <div style="text-align: center;">
+            <div class="mascot-emoji">🤖</div>
+            <div class="mascot-dots">
+                <div class="dot d1"></div>
+                <div class="dot d2"></div>
+                <div class="dot d3"></div>
+            </div>
+        </div>
     </div>
+    <style>
+        .mascot-emoji {
+            font-size: 5rem;
+            animation: bounce 2s infinite ease-in-out;
+        }
+        .mascot-dots {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+        }
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 1.2s infinite ease-in-out;
+        }
+        .d1 { background-color: #e94560; animation-delay: 0s; }
+        .d2 { background-color: #f5a623; animation-delay: 0.2s; }
+        .d3 { background-color: #00bcd4; animation-delay: 0.4s; }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(0.6); opacity: 0.4; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+    </style>
     """
-    components.html(lottie_html, height=height)
+    components.html(mascot_html, height=160)
 
 # --- Page Config ---
 st.set_page_config(
@@ -128,28 +164,30 @@ suggested_questions = [
 
 # Display suggestions if no chat history
 if not st.session_state.messages:
-    col_lottie, col_sug = st.columns([1, 2.5])
-    with col_lottie:
-        render_lottie("https://assets5.lottiefiles.com/packages/lf20_enlitd9r.json", height=200)
-    with col_sug:
-        st.subheader("💡 Try asking one of these:")
-        cols = st.columns(2)
-        for idx, q in enumerate(suggested_questions):
-            col = cols[idx % 2]
-            if col.button(q, key=f"suggest_{idx}"):
-                st.session_state.messages.append({"role": "user", "content": q})
-                
-                # Show the spinner and invoke API
-                with st.spinner("🔍 IPLytics AI is analyzing database stats..."):
-                    response = ask_ai(q)
-                    if response and "answer" in response:
-                        st.session_state.messages.append({"role": "assistant", "content": response["answer"]})
-                    else:
-                        st.session_state.messages.append({
-                            "role": "assistant", 
-                            "content": "⚠️ Sorry, I encountered an error communicating with the backend. Please ensure the backend server is running."
-                        })
-                st.rerun()
+    # Centered bouncing robot mascot
+    render_mascot()
+    
+    # Center-aligned subheader
+    st.markdown("<h4 style='text-align: center; color: #ccd6f6; margin-bottom: 1.5rem; margin-top: 1rem;'>💡 Try asking one of these:</h4>", unsafe_allow_html=True)
+    
+    # Full-width 2-column suggestion buttons
+    cols = st.columns(2)
+    for idx, q in enumerate(suggested_questions):
+        col = cols[idx % 2]
+        if col.button(q, key=f"suggest_{idx}"):
+            st.session_state.messages.append({"role": "user", "content": q})
+            
+            # Show the spinner and invoke API
+            with st.spinner("🔍 IPLytics AI is analyzing database stats..."):
+                response = ask_ai(q)
+                if response and "answer" in response:
+                    st.session_state.messages.append({"role": "assistant", "content": response["answer"]})
+                else:
+                    st.session_state.messages.append({
+                        "role": "assistant", 
+                        "content": "⚠️ Sorry, I encountered an error communicating with the backend. Please ensure the backend server is running."
+                    })
+            st.rerun()
 
 # Display chat history
 for message in st.session_state.messages:
