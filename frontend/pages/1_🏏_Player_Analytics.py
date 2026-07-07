@@ -99,6 +99,9 @@ st.markdown("""
     section[data-testid="stSidebar"] {
         background: linear-gradient(180deg, #0f0f23, #1a1a2e);
     }
+    [data-testid="stSidebarNavItems"] {
+        max-height: none !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 

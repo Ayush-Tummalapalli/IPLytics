@@ -53,8 +53,11 @@ st.markdown("""
     }
     section[data-testid="stSidebar"] {
         background: linear-gradient(180deg, #0f0f23, #1a1a2e);
-    }
-    .vs-text {
+     }
+     [data-testid="stSidebarNavItems"] {
+        max-height: none !important;
+     }
+     .vs-text {
         font-size: 2rem; font-weight: 800;
         color: #f5a623; text-align: center;
         padding: 2rem 0;

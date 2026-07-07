@@ -99,6 +99,10 @@ st.markdown("""
         background: linear-gradient(180deg, #0f0f23, #1a1a2e);
         border-right: 1px solid #e9456020;
     }
+    
+    [data-testid="stSidebarNavItems"] {
+        max-height: none !important;
+    }
 
     /* Feature card styling */
     .feature-card {
