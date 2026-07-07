@@ -138,18 +138,18 @@ if not st.session_state.messages:
             col = cols[idx % 2]
             if col.button(q, key=f"suggest_{idx}"):
                 st.session_state.messages.append({"role": "user", "content": q})
-            
-            # Show the spinner and invoke API
-            with st.spinner("🔍 IPLytics AI is analyzing database stats..."):
-                response = ask_ai(q)
-                if response and "answer" in response:
-                    st.session_state.messages.append({"role": "assistant", "content": response["answer"]})
-                else:
-                    st.session_state.messages.append({
-                        "role": "assistant", 
-                        "content": "⚠️ Sorry, I encountered an error communicating with the backend. Please ensure the backend server is running."
-                    })
-            st.rerun()
+                
+                # Show the spinner and invoke API
+                with st.spinner("🔍 IPLytics AI is analyzing database stats..."):
+                    response = ask_ai(q)
+                    if response and "answer" in response:
+                        st.session_state.messages.append({"role": "assistant", "content": response["answer"]})
+                    else:
+                        st.session_state.messages.append({
+                            "role": "assistant", 
+                            "content": "⚠️ Sorry, I encountered an error communicating with the backend. Please ensure the backend server is running."
+                        })
+                st.rerun()
 
 # Display chat history
 for message in st.session_state.messages:
