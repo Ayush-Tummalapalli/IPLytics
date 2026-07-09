@@ -319,107 +319,72 @@ def load_deliveries(
     session: Session,
 ) -> int:
     """
-    Load ball-by-ball deliveries.
+    Load ball-by-ball deliveries using high-speed COPY expert streaming protocol.
     """
-    from backend.app.models.delivery import Delivery
+    import io
+    logger.info("📋 Preparing deliveries for COPY expert streaming...")
 
-    logger.info("📋 Loading deliveries...")
-    logger.info("  (This may take 1-2 minutes for ~280K rows)")
+    # 1. Filter match IDs
+    df_filtered = df[df["match_id"].isin(valid_match_ids)].copy()
 
-    BATCH_SIZE = 5000
-    loaded = 0
-    skipped = 0
-    fk_skipped = 0
-    batch: list[dict] = []
+    # 2. Map team names to IDs
+    df_filtered["batting_team_clean"] = df_filtered["batting_team"].astype(str).str.strip()
+    df_filtered["bowling_team_clean"] = df_filtered["bowling_team"].astype(str).str.strip()
 
-    for _, row in df.iterrows():
-        try:
-            match_id = int(row["match_id"])
+    df_filtered["batting_team_id"] = df_filtered["batting_team_clean"].map(team_id_map)
+    df_filtered["bowling_team_id"] = df_filtered["bowling_team_clean"].map(team_id_map)
 
-            # Skip deliveries for matches not in our database
-            if match_id not in valid_match_ids:
-                fk_skipped += 1
-                continue
+    # Drop rows where teams didn't map correctly
+    df_filtered = df_filtered.dropna(subset=["batting_team_id", "bowling_team_id"])
 
-            # Map team IDs
-            bat_team_name = str(row["batting_team"]).strip()
-            bowl_team_name = str(row["bowling_team"]).strip()
-            
-            batting_team_id = team_id_map.get(bat_team_name)
-            bowling_team_id = team_id_map.get(bowl_team_name)
+    # 3. Clean columns (null-handling)
+    def clean_col(series, max_len=None):
+        cleaned = series.fillna("").astype(str).str.strip()
+        mask = cleaned.isin(["nan", "None", ""])
+        cleaned = cleaned.where(~mask, None)
+        if max_len:
+            cleaned = cleaned.str.slice(0, max_len)
+        return cleaned
 
-            if not batting_team_id or not bowling_team_id:
-                skipped += 1
-                continue
+    df_filtered["wicket_kind"] = clean_col(df_filtered["wicket_kind"])
+    df_filtered["player_dismissed"] = clean_col(df_filtered["player_out"])
+    df_filtered["fielder"] = clean_col(df_filtered["fielders"], 100)
+    df_filtered["extra_type"] = clean_col(df_filtered["extra_type"], 20)
 
-            # Wicket info
-            wicket_kind = None
-            player_dismissed = None
-            fielder = None
+    # 4. Filter columns and order them exactly for the COPY command
+    cols_to_copy = [
+        "match_id", "innings", "over", "ball", "batting_team_id", "bowling_team_id",
+        "batter", "non_striker", "bowler", "runs_batter", "runs_extras", "runs_total",
+        "extra_type", "wicket_kind", "player_dismissed", "fielder"
+    ]
+    df_copy = df_filtered[cols_to_copy].copy()
 
-            wk = row.get("wicket_kind")
-            if pd.notna(wk) and str(wk).strip() and str(wk).strip().lower() != "nan":
-                wicket_kind = str(wk).strip().lower()
-            
-            po = row.get("player_out")
-            if pd.notna(po) and str(po).strip() and str(po).strip().lower() != "nan":
-                player_dismissed = str(po).strip()
-            
-            fi = row.get("fielders")
-            if pd.notna(fi) and str(fi).strip() and str(fi).strip().lower() != "nan":
-                fielder = str(fi).strip()[:100]
+    # Force column data types to match DB schema
+    int_cols = ["match_id", "innings", "over", "ball", "batting_team_id", "bowling_team_id", "runs_batter", "runs_extras", "runs_total"]
+    for col in int_cols:
+        df_copy[col] = df_copy[col].astype(int)
 
-            # Extra type
-            extra_type = None
-            et = row.get("extra_type")
-            if pd.notna(et) and str(et).strip() and str(et).strip().lower() != "nan":
-                extra_type = str(et).strip().lower()[:20]
+    str_cols = ["batter", "non_striker", "bowler"]
+    for col in str_cols:
+        df_copy[col] = df_copy[col].astype(str).str.strip()
 
-            batch.append({
-                "match_id": match_id,
-                "innings": int(row["innings"]),
-                "over": int(row["over"]),
-                "ball": int(row["ball"]),
-                "batting_team_id": batting_team_id,
-                "bowling_team_id": bowling_team_id,
-                "batter": str(row["batter"]).strip(),
-                "non_striker": str(row["non_striker"]).strip(),
-                "bowler": str(row["bowler"]).strip(),
-                "runs_batter": int(row["runs_batter"]),
-                "runs_extras": int(row["runs_extras"]),
-                "runs_total": int(row["runs_total"]),
-                "extra_type": extra_type,
-                "wicket_kind": wicket_kind,
-                "player_dismissed": player_dismissed,
-                "fielder": fielder,
-            })
+    # Convert to in-memory tab-separated buffer
+    logger.info("  Preparing streaming buffer for COPY protocol...")
+    buf = io.StringIO()
+    df_copy.to_csv(buf, header=False, index=False, sep='\t', na_rep='\\N')
+    buf.seek(0)
 
-            if len(batch) >= BATCH_SIZE:
-                session.bulk_save_objects([Delivery(**r) for r in batch])
-                session.commit()
-                loaded += len(batch)
-                batch = []
-
-                if loaded % 50000 == 0:
-                    logger.info("  Deliveries loaded: %d / ~%d...", loaded, len(df))
-
-        except Exception as e:
-            logger.warning(
-                "  Skipping delivery (match=%s, over=%s, ball=%s): %s",
-                row.get("match_id", "?"), row.get("over", "?"),
-                row.get("ball", "?"), e
-            )
-            skipped += 1
-            continue
-
-    # Flush remaining batch
-    if batch:
-        session.bulk_save_objects([Delivery(**r) for r in batch])
-        session.commit()
-        loaded += len(batch)
-
-    logger.info("✅ Loaded %d deliveries (%d skipped, %d FK-skipped)", loaded, skipped, fk_skipped)
-    return loaded
+    # 5. Execute copy_expert using raw psycopg2 connection
+    logger.info("  Streaming %d deliveries into Neon using COPY expert...", len(df_copy))
+    raw_conn = session.connection().connection
+    cursor = raw_conn.cursor()
+    cursor.copy_expert(
+        "COPY deliveries (match_id, innings, \"over\", ball, batting_team_id, bowling_team_id, batter, non_striker, bowler, runs_batter, runs_extras, runs_total, extra_type, wicket_kind, player_dismissed, fielder) FROM STDIN WITH NULL AS '\\N'",
+        buf
+    )
+    raw_conn.commit()
+    logger.info("✅ Successfully loaded %d deliveries!", len(df_copy))
+    return len(df_copy)
 
 
 # =================================================================
