@@ -42,9 +42,15 @@ st.markdown("""
         font-family: 'Outfit', sans-serif !important;
     }
 
-    /* Dark theme overrides */
+    /* Dark theme overrides with subtle grid mesh */
     .stApp {
         background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+        background-image: 
+            linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+        background-size: 50px 50px;
+        background-position: center;
+        background-attachment: fixed;
     }
 
     /* Hero title styling */
@@ -200,6 +206,24 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
+def render_wave_divider() -> None:
+    """Render a premium dynamic SVG wave divider."""
+    st.markdown("""
+    <div style="margin: 2rem 0; width: 100%; overflow: hidden; opacity: 0.15;">
+        <svg viewBox="0 0 1200 40" preserveAspectRatio="none" style="width: 100%; height: 20px;">
+            <path d="M0,20 C150,5 300,35 450,20 C600,5 750,35 900,20 C1050,5 1200,20 1200,20" fill="none" stroke="url(#wave-grad)" stroke-width="3" stroke-linecap="round"/>
+            <defs>
+                <linearGradient id="wave-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#e94560" />
+                    <stop offset="50%" stop-color="#b085f5" />
+                    <stop offset="100%" stop-color="#f5a623" />
+                </linearGradient>
+            </defs>
+        </svg>
+    </div>
+    """, unsafe_allow_html=True)
+
+
 def main() -> None:
     """Render the IPLytics home dashboard."""
 
@@ -229,7 +253,7 @@ def main() -> None:
         with col4:
             st.metric("Venues", f"{len(venues)}")
 
-    st.divider()
+    render_wave_divider()
 
     # --- Feature Cards ---
     st.markdown("### 📊 Explore Analytics")
@@ -316,7 +340,7 @@ def main() -> None:
         </a>
         """, unsafe_allow_html=True)
 
-    st.divider()
+    render_wave_divider()
 
     # --- Quick Info ---
     st.markdown("### 🔥 Quick Facts")
