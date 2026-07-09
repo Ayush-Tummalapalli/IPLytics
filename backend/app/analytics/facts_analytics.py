@@ -566,6 +566,61 @@ def get_ipl_facts(session: Session) -> dict:
         "value": int(fielder_dismissals_agg[1]) if fielder_dismissals_agg else 0
     }
 
+    # 31. Most Career Fours
+    career_fours_agg = (
+        session.query(Delivery.batter, func.count(Delivery.id).label("fours"))
+        .filter(Delivery.runs_batter == 4)
+        .group_by(Delivery.batter)
+        .order_by(desc("fours"))
+        .first()
+    )
+    career_fours = {
+        "player": career_fours_agg[0] if career_fours_agg else "Unknown",
+        "value": int(career_fours_agg[1]) if career_fours_agg else 0
+    }
+
+    # 32. Most Wickets in a Single Season
+    season_wkts_agg = (
+        session.query(
+            Match.season,
+            Delivery.bowler,
+            func.count(Delivery.id).label("wickets")
+        )
+        .join(Match, Match.id == Delivery.match_id)
+        .filter(
+            Delivery.player_dismissed.isnot(None),
+            Delivery.wicket_kind.in_(["bowled", "caught", "lbw", "stumped", "caught and bowled", "hit wicket"])
+        )
+        .group_by(Match.season, Delivery.bowler)
+        .order_by(desc("wickets"))
+        .first()
+    )
+    most_wickets_season = {}
+    if season_wkts_agg:
+        most_wickets_season = {
+            "season": int(season_wkts_agg[0]),
+            "player": season_wkts_agg[1],
+            "value": int(season_wkts_agg[2])
+        }
+
+    # 33. Highest Match Aggregate
+    match_aggregate_agg = (
+        session.query(
+            Delivery.match_id,
+            func.sum(Delivery.runs_total).label("total_runs")
+        )
+        .group_by(Delivery.match_id)
+        .order_by(desc("total_runs"))
+        .first()
+    )
+    highest_match_aggregate = {}
+    if match_aggregate_agg:
+        m_info = get_match_info(match_aggregate_agg[0])
+        highest_match_aggregate = {
+            "value": int(match_aggregate_agg[1]),
+            "match": m_info
+        }
+
     return {
         "totals": {
             "matches": total_matches,
@@ -600,6 +655,9 @@ def get_ipl_facts(session: Session) -> dict:
             "career_sixes": career_sixes,
             "career_dots": career_dots,
             "most_fifties": most_fifties,
-            "fielder_dismissals": fielder_dismissals
+            "fielder_dismissals": fielder_dismissals,
+            "career_fours": career_fours,
+            "most_wickets_season": most_wickets_season,
+            "highest_match_aggregate": highest_match_aggregate
         }
     }

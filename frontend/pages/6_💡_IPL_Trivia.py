@@ -213,6 +213,15 @@ with tab1:
             value=f"{csix.get('value', 0):,} Sixes",
             description=f"**{csix.get('player')}** is the tournament's overall leading six-hitter, clearing the ropes with ease and intimidating bowling lineups year after year."
         )
+
+        cfours = records.get("career_fours", {})
+        render_card(
+            icon="🏏",
+            badge="Four-Hitting Machine",
+            title="Most Career Fours",
+            value=f"{cfours.get('value', 0):,} Fours",
+            description=f"**{cfours.get('player')}** holds the record for hitting the most fours in IPL history, routinely finding gaps in the field with exquisite timing."
+        )
         
         render_card(
             icon="🥎",
@@ -302,6 +311,15 @@ with tab2:
             description=f"Bowled by **{es.get('player')}** ({es.get('overs')} overs) against **{es_match.get('team1', {}).get('name') if es_match.get('team1', {}).get('name') != es.get('player') else es_match.get('team2', {}).get('name')}** during the **{es_match.get('season')}** season."
         )
         
+        mws = records.get("most_wickets_season", {})
+        render_card(
+            icon="👑",
+            badge="Season Masterclass",
+            title="Most Wickets in a Single Season",
+            value=f"{mws.get('value', 0)} Wickets",
+            description=f"**{mws.get('player')}** holds this all-time Purple Cap record, taking a spectacular number of wickets during the **{mws.get('season')}** season."
+        )
+
         render_card(
             icon="🚨",
             badge="Extras Stat",
@@ -344,6 +362,16 @@ with tab3:
             description=f"Recorded by **{lw.get('team', {}).get('name')}** in a match against **{lw_match.get('team1', {}).get('name') if lw_match.get('team1', {}).get('name') != lw.get('team', {}).get('name') else lw_match.get('team2', {}).get('name')}** on **{lw_match.get('date')}**."
         )
         
+        hmag = records.get("highest_match_aggregate", {})
+        hmag_match = hmag.get("match", {})
+        render_card(
+            icon="🏏",
+            badge="Scoring Bonanza",
+            title="Highest Match Aggregate Score",
+            value=f"{hmag.get('value', 0)} Runs",
+            description=f"This absolute thriller match played between **{hmag_match.get('team1', {}).get('short_name')}** and **{hmag_match.get('team2', {}).get('short_name')}** on **{hmag_match.get('date')}** produced the highest combined match runs in tournament history."
+        )
+
         m_toss = records.get("most_toss_wins", {})
         render_card(
             icon="🪙",
