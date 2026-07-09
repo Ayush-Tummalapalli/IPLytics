@@ -22,6 +22,7 @@ from backend.app.analytics.player_analytics import (
     get_player_season_wickets,
     search_players,
     get_player_teams,
+    get_player_phases_stats,
 )
 
 logger = logging.getLogger(__name__)
@@ -83,6 +84,9 @@ def get_player(
     # Get player teams
     teams = get_player_teams(db, name)
 
+    # Get phases of play stats
+    phases = get_player_phases_stats(db, name)
+
     # Check stumpings in career to dynamically identify wicket-keepers
     stumpings = db.query(func.count(Delivery.id)).filter(
         Delivery.fielder == name,
@@ -97,4 +101,5 @@ def get_player(
         "season_wickets": season_wickets,
         "teams": teams,
         "is_wicketkeeper": is_wicketkeeper,
+        "phases": phases,
     }

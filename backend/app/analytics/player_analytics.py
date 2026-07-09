@@ -453,3 +453,82 @@ def get_matchup_stats(session: Session, batter: str, bowler: str) -> dict:
         },
         "seasons": season_breakdown
     }
+
+
+def get_player_phases_stats(session: Session, player_name: str) -> dict:
+    """
+    Compute batting and bowling stats split by game phases:
+    - Powerplay (Overs 1-6 / overs 0-5)
+    - Middle Overs (Overs 7-15 / overs 6-14)
+    - Death Overs (Overs 16-20 / overs 15-19)
+    """
+    # --- Batting Phase Stats ---
+    batting_phases = session.query(
+        case(
+            (Delivery.over <= 5, "powerplay"),
+            (Delivery.over <= 14, "middle"),
+            else_="death"
+        ).label("phase"),
+        func.sum(Delivery.runs_batter).label("runs"),
+        func.count(Delivery.id).label("balls_faced")
+    ).filter(
+        Delivery.batter == player_name,
+        Delivery.extra_type.is_(None) | (Delivery.extra_type != "wides")
+    ).group_by(
+        "phase"
+    ).all()
+
+    bat_dict = {
+        "powerplay": {"runs": 0, "balls": 0, "strike_rate": 0.0},
+        "middle": {"runs": 0, "balls": 0, "strike_rate": 0.0},
+        "death": {"runs": 0, "balls": 0, "strike_rate": 0.0}
+    }
+    for row in batting_phases:
+        phase = row.phase
+        runs = int(row.runs or 0)
+        balls = int(row.balls_faced or 0)
+        sr = round((runs / balls) * 100, 2) if balls > 0 else 0.0
+        bat_dict[phase] = {"runs": runs, "balls": balls, "strike_rate": sr}
+
+    # --- Bowling Phase Stats ---
+    BOWLER_WICKETS = ["bowled", "caught", "caught and bowled", "hit wicket", "lbw", "stumped"]
+    bowling_phases = session.query(
+        case(
+            (Delivery.over <= 5, "powerplay"),
+            (Delivery.over <= 14, "middle"),
+            else_="death"
+        ).label("phase"),
+        func.sum(case(
+            (Delivery.wicket_kind.in_(BOWLER_WICKETS), 1),
+            else_=0
+        )).label("wickets"),
+        func.sum(Delivery.runs_total).label("runs_conceded"),
+        func.count(Delivery.id).label("total_balls"),
+        func.sum(case(
+            (Delivery.extra_type.is_(None) | ~Delivery.extra_type.in_(["wides", "noballs"]), 1),
+            else_=0
+        )).label("legal_balls")
+    ).filter(
+        Delivery.bowler == player_name
+    ).group_by(
+        "phase"
+    ).all()
+
+    bowl_dict = {
+        "powerplay": {"wickets": 0, "runs_conceded": 0, "balls_bowled": 0, "economy": 0.0},
+        "middle": {"wickets": 0, "runs_conceded": 0, "balls_bowled": 0, "economy": 0.0},
+        "death": {"wickets": 0, "runs_conceded": 0, "balls_bowled": 0, "economy": 0.0}
+    }
+    for row in bowling_phases:
+        phase = row.phase
+        wkts = int(row.wickets or 0)
+        runs_c = int(row.runs_conceded or 0)
+        balls_b = int(row.total_balls or 0)
+        legal_b = int(row.legal_balls or 0)
+        econ = round((runs_c * 6) / legal_b, 2) if legal_b > 0 else 0.0
+        bowl_dict[phase] = {"wickets": wkts, "runs_conceded": runs_c, "balls_bowled": balls_b, "economy": econ}
+
+    return {
+        "batting": bat_dict,
+        "bowling": bowl_dict
+    }

@@ -533,6 +533,108 @@ def generate_trophy_cabinet_html(batting: dict, bowling: dict, orange_seasons: l
     return "".join(html_lines).replace("\n", "").replace("\r", "").strip()
 
 
+def render_phases_dashboard(phases: dict, player_name: str) -> None:
+    """Render a premium side-by-side dashboard of performance split by phase of play."""
+    if not phases:
+        return
+        
+    bat_phases = phases.get("batting", {})
+    bowl_phases = phases.get("bowling", {})
+    
+    st.markdown("### ⏱️ Phase of Play Breakdown")
+    st.caption("Detailed tactical analysis of batting (Runs & Strike Rate) and bowling (Wickets & Economy) across matches.")
+    
+    col_bat, col_bowl = st.columns(2)
+    
+    with col_bat:
+        st.markdown(f"#### 🏏 Batting Phase Performance")
+        
+        pp = bat_phases.get("powerplay", {"runs": 0, "balls": 0, "strike_rate": 0.0})
+        mid = bat_phases.get("middle", {"runs": 0, "balls": 0, "strike_rate": 0.0})
+        death = bat_phases.get("death", {"runs": 0, "balls": 0, "strike_rate": 0.0})
+        
+        pp_pct = min(100.0, (pp["strike_rate"] / 200.0) * 100.0)
+        mid_pct = min(100.0, (mid["strike_rate"] / 200.0) * 100.0)
+        death_pct = min(100.0, (death["strike_rate"] / 250.0) * 100.0)
+        
+        html_bat = f"""
+        <div style="display: flex; flex-direction: column; gap: 1rem; background: rgba(26, 26, 46, 0.3); border: 1px solid rgba(233, 69, 96, 0.1); border-radius: 12px; padding: 1.25rem;">
+            <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #ccd6f6; margin-bottom: 0.25rem;">
+                    <span>⚡ <strong>Powerplay (Overs 1-6)</strong></span>
+                    <span><strong>{pp['runs']}</strong> runs @ <strong>{pp['strike_rate']}</strong> SR</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div style="background: linear-gradient(90deg, #ff7b90, #e94560); width: {pp_pct}%; height: 100%;"></div>
+                </div>
+            </div>
+            <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #ccd6f6; margin-bottom: 0.25rem;">
+                    <span>🔄 <strong>Middle Overs (Overs 7-15)</strong></span>
+                    <span><strong>{mid['runs']}</strong> runs @ <strong>{mid['strike_rate']}</strong> SR</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div style="background: linear-gradient(90deg, #ffaf40, #ff9f43); width: {mid_pct}%; height: 100%;"></div>
+                </div>
+            </div>
+            <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #ccd6f6; margin-bottom: 0.25rem;">
+                    <span>💥 <strong>Death Overs (Overs 16-20)</strong></span>
+                    <span><strong>{death['runs']}</strong> runs @ <strong>{death['strike_rate']}</strong> SR</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div style="background: linear-gradient(90deg, #ff4d4d, #ff3838); width: {death_pct}%; height: 100%;"></div>
+                </div>
+            </div>
+        </div>
+        """
+        st.markdown(html_bat.replace("\n", "").strip(), unsafe_allow_html=True)
+        
+    with col_bowl:
+        st.markdown(f"#### 🎳 Bowling Phase Performance")
+        
+        pp_bowl = bowl_phases.get("powerplay", {"wickets": 0, "runs_conceded": 0, "balls_bowled": 0, "economy": 0.0})
+        mid_bowl = bowl_phases.get("middle", {"wickets": 0, "runs_conceded": 0, "balls_bowled": 0, "economy": 0.0})
+        death_bowl = bowl_phases.get("death", {"wickets": 0, "runs_conceded": 0, "balls_bowled": 0, "economy": 0.0})
+        
+        pp_econ_pct = min(100.0, max(0.0, (15.0 - pp_bowl["economy"]) / 15.0 * 100.0))
+        mid_econ_pct = min(100.0, max(0.0, (15.0 - mid_bowl["economy"]) / 15.0 * 100.0))
+        death_econ_pct = min(100.0, max(0.0, (15.0 - death_bowl["economy"]) / 15.0 * 100.0))
+        
+        html_bowl = f"""
+        <div style="display: flex; flex-direction: column; gap: 1rem; background: rgba(26, 26, 46, 0.3); border: 1px solid rgba(0, 188, 212, 0.1); border-radius: 12px; padding: 1.25rem;">
+            <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #ccd6f6; margin-bottom: 0.25rem;">
+                    <span>⚡ <strong>Powerplay (Overs 1-6)</strong></span>
+                    <span><strong>{pp_bowl['wickets']}</strong> wkts @ <strong>{pp_bowl['economy']}</strong> Econ</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div style="background: linear-gradient(90deg, #48dbfb, #00d2d3); width: {pp_econ_pct}%; height: 100%;"></div>
+                </div>
+            </div>
+            <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #ccd6f6; margin-bottom: 0.25rem;">
+                    <span>🔄 <strong>Middle Overs (Overs 7-15)</strong></span>
+                    <span><strong>{mid_bowl['wickets']}</strong> wkts @ <strong>{mid_bowl['economy']}</strong> Econ</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div style="background: linear-gradient(90deg, #a4b0be, #747d8c); width: {mid_econ_pct}%; height: 100%;"></div>
+                </div>
+            </div>
+            <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #ccd6f6; margin-bottom: 0.25rem;">
+                    <span>💥 <strong>Death Overs (Overs 16-20)</strong></span>
+                    <span><strong>{death_bowl['wickets']}</strong> wkts @ <strong>{death_bowl['economy']}</strong> Econ</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div style="background: linear-gradient(90deg, #b085f5, #5f27cd); width: {death_econ_pct}%; height: 100%;"></div>
+                </div>
+            </div>
+        </div>
+        """
+        st.markdown(html_bowl.replace("\n", "").strip(), unsafe_allow_html=True)
+
+
 # ── Main page layout ───────────────────────────────────────────────
 
 def main() -> None:
@@ -598,6 +700,7 @@ def main() -> None:
     bowling: dict = stats.get("bowling", {})
     season_runs: list[dict] = stats.get("season_runs", [])
     season_wickets: list[dict] = stats.get("season_wickets", [])
+    phases: dict = stats.get("phases", {})
 
     has_batted = batting.get("matches", 0) > 0
     has_bowled = bowling.get("matches", 0) > 0
@@ -672,6 +775,10 @@ def main() -> None:
     render_batting_metrics(batting)
     st.divider()
     render_bowling_metrics(bowling)
+    st.divider()
+
+    # ── Phase of Play Breakdown ──
+    render_phases_dashboard(phases, selected_player)
     st.divider()
 
     # ── Charts side-by-side ──
