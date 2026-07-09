@@ -208,38 +208,46 @@ def main() -> None:
 
     with col1:
         st.markdown("""
-        <div class="feature-card">
-            <div class="feature-icon">🏏</div>
-            <div class="feature-name">Player Analytics</div>
-            <div class="feature-desc">Batting & bowling stats, season trends, milestones</div>
-        </div>
+        <a href="/Player_Analytics" target="_self" style="text-decoration: none;">
+            <div class="feature-card">
+                <div class="feature-icon">🏏</div>
+                <div class="feature-name">Player Analytics</div>
+                <div class="feature-desc">Batting & bowling stats, season trends, milestones</div>
+            </div>
+        </a>
         """, unsafe_allow_html=True)
 
     with col2:
         st.markdown("""
-        <div class="feature-card">
-            <div class="feature-icon">🏆</div>
-            <div class="feature-name">Team Analytics</div>
-            <div class="feature-desc">Win records, season performance, toss analysis</div>
-        </div>
+        <a href="/Team_Analytics" target="_self" style="text-decoration: none;">
+            <div class="feature-card">
+                <div class="feature-icon">🏆</div>
+                <div class="feature-name">Team Analytics</div>
+                <div class="feature-desc">Win records, season performance, toss analysis</div>
+            </div>
+        </a>
         """, unsafe_allow_html=True)
 
     with col3:
         st.markdown("""
-        <div class="feature-card">
-            <div class="feature-icon">🏟️</div>
-            <div class="feature-name">Venue Analytics</div>
-            <div class="feature-desc">Scoring patterns, chase success rates, pitch trends</div>
-        </div>
+        <a href="/Venue_Analytics" target="_self" style="text-decoration: none;">
+            <div class="feature-card">
+                <div class="feature-icon">🏟️</div>
+                <div class="feature-name">Venue Analytics</div>
+                <div class="feature-desc">Scoring patterns, chase success rates, pitch trends</div>
+            </div>
+        </a>
         """, unsafe_allow_html=True)
 
     with col4:
         st.markdown("""
-        <div class="feature-card">
-            <div class="feature-icon">⚔️</div>
-            <div class="feature-name">Comparisons</div>
-            <div class="feature-desc">Player vs Player, Team vs Team, Head-to-Head</div>
-        </div>
+        <a href="/Comparisons" target="_self" style="text-decoration: none;">
+            <div class="feature-card">
+                <div class="feature-icon">⚔️</div>
+                <div class="feature-name">Comparisons</div>
+                <div class="feature-desc">Player vs Player, Team vs Team, Head-to-Head</div>
+            </div>
+        </a>
         """, unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
@@ -247,29 +255,35 @@ def main() -> None:
 
     with col5:
         st.markdown("""
-        <div class="feature-card">
-            <div class="feature-icon">🤖</div>
-            <div class="feature-name">AI Assistant</div>
-            <div class="feature-desc">Google Gemini-powered smart queries and RAG insights</div>
-        </div>
+        <a href="/AI_Assistant" target="_self" style="text-decoration: none;">
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <div class="feature-name">AI Assistant</div>
+                <div class="feature-desc">Google Gemini-powered smart queries and RAG insights</div>
+            </div>
+        </a>
         """, unsafe_allow_html=True)
 
     with col6:
         st.markdown("""
-        <div class="feature-card">
-            <div class="feature-icon">💡</div>
-            <div class="feature-name">IPL Trivia & Facts</div>
-            <div class="feature-desc">25+ dynamic milestones, records, and stats</div>
-        </div>
+        <a href="/IPL_Trivia" target="_self" style="text-decoration: none;">
+            <div class="feature-card">
+                <div class="feature-icon">💡</div>
+                <div class="feature-name">IPL Trivia & Facts</div>
+                <div class="feature-desc">25+ dynamic milestones, records, and stats</div>
+            </div>
+        </a>
         """, unsafe_allow_html=True)
 
     with col7:
         st.markdown("""
-        <div class="feature-card">
-            <div class="feature-icon">🏆</div>
-            <div class="feature-name">IPL Leaderboards</div>
-            <div class="feature-desc">Orange/Purple Caps and Top 10 career records</div>
-        </div>
+        <a href="/IPL_Leaders" target="_self" style="text-decoration: none;">
+            <div class="feature-card">
+                <div class="feature-icon">🏆</div>
+                <div class="feature-name">IPL Leaderboards</div>
+                <div class="feature-desc">Orange/Purple Caps and Top 10 career records</div>
+            </div>
+        </a>
         """, unsafe_allow_html=True)
 
     st.divider()
