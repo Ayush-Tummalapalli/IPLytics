@@ -148,6 +148,7 @@ def get_player_batting_stats(session: Session, player_name: str) -> dict:
         "sixes": sixes,
         "not_outs": not_outs,
         "ducks": ducks,
+        "runs_list": runs_per_innings,
     }
 
 
@@ -239,6 +240,8 @@ def get_player_bowling_stats(session: Session, player_name: str) -> dict:
     bowling_average = round(runs_conceded / wickets, 2) if wickets > 0 else 0.0
     bowling_sr = round(legal_balls / wickets, 2) if wickets > 0 else 0.0
 
+    wickets_per_match = [row.wickets for row in match_wickets]
+
     return {
         "name": player_name,
         "matches": matches_bowled,
@@ -249,6 +252,7 @@ def get_player_bowling_stats(session: Session, player_name: str) -> dict:
         "bowling_average": bowling_average,
         "bowling_strike_rate": bowling_sr,
         "best_figures": best_figures,
+        "wickets_list": wickets_per_match,
     }
 
 

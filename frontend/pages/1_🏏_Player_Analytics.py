@@ -224,6 +224,113 @@ def render_season_wickets_chart(season_wickets: list[dict], player_name: str, ha
     st.plotly_chart(fig, use_container_width=True)
 
 
+def render_consistency_charts(batting: dict, bowling: dict, player_name: str) -> None:
+    """Render the batsman score distribution and bowler wickets distribution side-by-side."""
+    st.markdown("### 🎯 Performance Consistency & Distribution")
+    st.caption("Detailed breakdown of scores and wickets per match to analyze player consistency.")
+    
+    col_bat, col_bowl = st.columns(2)
+    
+    # ── Batting consistency ──
+    with col_bat:
+        runs_list = batting.get("runs_list", [])
+        if runs_list:
+            brackets = {
+                "0-10 Runs": 0,
+                "11-30 Runs": 0,
+                "31-50 Runs": 0,
+                "51-99 Runs": 0,
+                "100+ Runs": 0
+            }
+            for runs in runs_list:
+                if runs <= 10:
+                    brackets["0-10 Runs"] += 1
+                elif runs <= 30:
+                    brackets["11-30 Runs"] += 1
+                elif runs <= 50:
+                    brackets["31-50 Runs"] += 1
+                elif runs < 100:
+                    brackets["51-99 Runs"] += 1
+                else:
+                    brackets["100+ Runs"] += 1
+                    
+            labels = list(brackets.keys())
+            values = list(brackets.values())
+            
+            non_zero = [(l, v) for l, v in zip(labels, values) if v > 0]
+            if non_zero:
+                labels, values = zip(*non_zero)
+                
+            fig_bat = go.Figure(data=[go.Pie(
+                labels=labels,
+                values=values,
+                hole=0.45,
+                marker_colors=["#e94560", "#ff6b6b", "#f5a623", "#4ecdc4", "#10ac84"],
+                textfont=dict(color="#ccd6f6", size=12),
+                textinfo="percent+label",
+            )])
+            fig_bat.update_layout(
+                title=f"🏏 Batting Score Split — {player_name}",
+                template="plotly_dark",
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                margin=dict(t=50, b=20, l=20, r=20),
+                height=350,
+                legend=dict(font=dict(color="#ccd6f6"))
+            )
+            st.plotly_chart(fig_bat, use_container_width=True)
+        else:
+            st.info("No batting innings data available to analyze consistency.")
+            
+    # ── Bowling consistency ──
+    with col_bowl:
+        wickets_list = bowling.get("wickets_list", [])
+        if wickets_list and bowling.get("matches", 0) > 0:
+            brackets = {
+                "0 Wickets": 0,
+                "1-2 Wickets": 0,
+                "3-4 Wickets": 0,
+                "5+ Wickets": 0
+            }
+            for wkts in wickets_list:
+                if wkts == 0:
+                    brackets["0 Wickets"] += 1
+                elif wkts <= 2:
+                    brackets["1-2 Wickets"] += 1
+                elif wkts <= 4:
+                    brackets["3-4 Wickets"] += 1
+                else:
+                    brackets["5+ Wickets"] += 1
+                    
+            labels = list(brackets.keys())
+            values = list(brackets.values())
+            
+            non_zero = [(l, v) for l, v in zip(labels, values) if v > 0]
+            if non_zero:
+                labels, values = zip(*non_zero)
+                
+            fig_bowl = go.Figure(data=[go.Pie(
+                labels=labels,
+                values=values,
+                hole=0.45,
+                marker_colors=["#48dbfb", "#b085f5", "#5f27cd", "#ff9ff3"],
+                textfont=dict(color="#ccd6f6", size=12),
+                textinfo="percent+label",
+            )])
+            fig_bowl.update_layout(
+                title=f"🎳 Bowling Wicket Split — {player_name}",
+                template="plotly_dark",
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                margin=dict(t=50, b=20, l=20, r=20),
+                height=350,
+                legend=dict(font=dict(color="#ccd6f6"))
+            )
+            st.plotly_chart(fig_bowl, use_container_width=True)
+        else:
+            st.info("No bowling innings data available to analyze consistency.")
+
+
 # ── Main page layout ───────────────────────────────────────────────
 
 def main() -> None:
@@ -354,6 +461,9 @@ def main() -> None:
 
     with col_season_wkts:
         render_season_wickets_chart(season_wickets, selected_player, has_bowled)
+
+    st.divider()
+    render_consistency_charts(batting, bowling, selected_player)
 
 
 main()
