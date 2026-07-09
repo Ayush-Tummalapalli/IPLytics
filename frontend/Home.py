@@ -106,8 +106,10 @@ st.markdown("""
 
     /* Feature card styling */
     .feature-card {
-        background: linear-gradient(135deg, #1a1a2e, #16213e);
-        border: 1px solid #e9456020;
+        background: rgba(26, 26, 46, 0.5);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 12px;
         padding: 1.5rem;
         text-align: center;
@@ -119,9 +121,37 @@ st.markdown("""
     }
 
     .feature-card:hover {
-        transform: translateY(-5px);
-        border-color: #e94560;
-        box-shadow: 0 12px 30px rgba(233, 69, 96, 0.35);
+        transform: translateY(-8px) scale(1.02);
+    }
+
+    /* Card themed neon hover glows */
+    .card-player:hover .feature-card {
+        border-color: rgba(233, 69, 96, 0.6);
+        box-shadow: 0 15px 35px rgba(233, 69, 96, 0.35);
+    }
+    .card-team:hover .feature-card {
+        border-color: rgba(245, 166, 35, 0.6);
+        box-shadow: 0 15px 35px rgba(245, 166, 35, 0.35);
+    }
+    .card-venue:hover .feature-card {
+        border-color: rgba(16, 185, 129, 0.6);
+        box-shadow: 0 15px 35px rgba(16, 185, 129, 0.35);
+    }
+    .card-compare:hover .feature-card {
+        border-color: rgba(0, 188, 212, 0.6);
+        box-shadow: 0 15px 35px rgba(0, 188, 212, 0.35);
+    }
+    .card-ai:hover .feature-card {
+        border-color: rgba(176, 133, 245, 0.6);
+        box-shadow: 0 15px 35px rgba(176, 133, 245, 0.35);
+    }
+    .card-trivia:hover .feature-card {
+        border-color: rgba(255, 215, 0, 0.6);
+        box-shadow: 0 15px 35px rgba(255, 215, 0, 0.35);
+    }
+    .card-leaders:hover .feature-card {
+        border-color: rgba(245, 166, 35, 0.6);
+        box-shadow: 0 15px 35px rgba(245, 166, 35, 0.35);
     }
 
     .feature-icon {
@@ -208,7 +238,7 @@ def main() -> None:
 
     with col1:
         st.markdown("""
-        <a href="/Player_Analytics" target="_self" style="text-decoration: none;">
+        <a href="/Player_Analytics" target="_self" class="card-player" style="text-decoration: none;">
             <div class="feature-card">
                 <div class="feature-icon">🏏</div>
                 <div class="feature-name">Player Analytics</div>
@@ -219,7 +249,7 @@ def main() -> None:
 
     with col2:
         st.markdown("""
-        <a href="/Team_Analytics" target="_self" style="text-decoration: none;">
+        <a href="/Team_Analytics" target="_self" class="card-team" style="text-decoration: none;">
             <div class="feature-card">
                 <div class="feature-icon">🏆</div>
                 <div class="feature-name">Team Analytics</div>
@@ -230,7 +260,7 @@ def main() -> None:
 
     with col3:
         st.markdown("""
-        <a href="/Venue_Analytics" target="_self" style="text-decoration: none;">
+        <a href="/Venue_Analytics" target="_self" class="card-venue" style="text-decoration: none;">
             <div class="feature-card">
                 <div class="feature-icon">🏟️</div>
                 <div class="feature-name">Venue Analytics</div>
@@ -241,7 +271,7 @@ def main() -> None:
 
     with col4:
         st.markdown("""
-        <a href="/Comparisons" target="_self" style="text-decoration: none;">
+        <a href="/Comparisons" target="_self" class="card-compare" style="text-decoration: none;">
             <div class="feature-card">
                 <div class="feature-icon">⚔️</div>
                 <div class="feature-name">Comparisons</div>
@@ -255,7 +285,7 @@ def main() -> None:
 
     with col5:
         st.markdown("""
-        <a href="/AI_Assistant" target="_self" style="text-decoration: none;">
+        <a href="/AI_Assistant" target="_self" class="card-ai" style="text-decoration: none;">
             <div class="feature-card">
                 <div class="feature-icon">🤖</div>
                 <div class="feature-name">AI Assistant</div>
@@ -266,7 +296,7 @@ def main() -> None:
 
     with col6:
         st.markdown("""
-        <a href="/IPL_Trivia" target="_self" style="text-decoration: none;">
+        <a href="/IPL_Trivia" target="_self" class="card-trivia" style="text-decoration: none;">
             <div class="feature-card">
                 <div class="feature-icon">💡</div>
                 <div class="feature-name">IPL Trivia & Facts</div>
@@ -277,7 +307,7 @@ def main() -> None:
 
     with col7:
         st.markdown("""
-        <a href="/IPL_Leaders" target="_self" style="text-decoration: none;">
+        <a href="/IPL_Leaders" target="_self" class="card-leaders" style="text-decoration: none;">
             <div class="feature-card">
                 <div class="feature-icon">🏆</div>
                 <div class="feature-name">IPL Leaderboards</div>
