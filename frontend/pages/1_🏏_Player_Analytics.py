@@ -267,8 +267,9 @@ def render_consistency_charts(batting: dict, bowling: dict, player_name: str) ->
                 hole=0.45,
                 marker_colors=["#e94560", "#ff6b6b", "#f5a623", "#4ecdc4", "#10ac84"],
                 textfont=dict(color="#ccd6f6", size=12),
-                textinfo="percent+label",
+                textinfo="percent",
             )])
+            fig_bat.update_traces(textposition="inside")
             fig_bat.update_layout(
                 title=f"🏏 Batting Score Split — {player_name}",
                 template="plotly_dark",
@@ -315,8 +316,9 @@ def render_consistency_charts(batting: dict, bowling: dict, player_name: str) ->
                 hole=0.45,
                 marker_colors=["#48dbfb", "#b085f5", "#5f27cd", "#ff9ff3"],
                 textfont=dict(color="#ccd6f6", size=12),
-                textinfo="percent+label",
+                textinfo="percent",
             )])
+            fig_bowl.update_traces(textposition="inside")
             fig_bowl.update_layout(
                 title=f"🎳 Bowling Wicket Split — {player_name}",
                 template="plotly_dark",
