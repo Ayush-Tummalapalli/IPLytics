@@ -603,10 +603,11 @@ def main() -> None:
     orange_seasons = []
     purple_seasons = []
     if leaders_data:
-        for cap in leaders_data.get("orange_caps", []):
+        caps_dict = leaders_data.get("caps", {})
+        for cap in caps_dict.get("orange", []):
             if cap.get("player") == selected_player:
                 orange_seasons.append(str(cap.get("season")))
-        for cap in leaders_data.get("purple_caps", []):
+        for cap in caps_dict.get("purple", []):
             if cap.get("player") == selected_player:
                 purple_seasons.append(str(cap.get("season")))
 
