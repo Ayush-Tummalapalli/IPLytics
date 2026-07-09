@@ -313,6 +313,163 @@ COLOR_P1 = "#e94560"
 COLOR_P2 = "#0f3460"
 COLOR_GOLD = "#f5a623"
 
+def render_batting_radar(b1, b2):
+    # Calculate values
+    avg1 = b1.get("average", 0) or 0
+    sr1 = b1.get("strike_rate", 0) or 0
+    fours1 = b1.get("fours", 0) or 0
+    sixes1 = b1.get("sixes", 0) or 0
+    balls1 = b1.get("balls_faced", 1) or 1
+    matches1 = b1.get("matches", 1) or 1
+    runs1 = b1.get("total_runs", 0) or 0
+    not_outs1 = b1.get("not_outs", 0) or 0
+    
+    bd_pct1 = (fours1 + sixes1) / balls1 * 100
+    rpm1 = runs1 / matches1
+    no_pct1 = not_outs1 / matches1 * 100
+    
+    avg2 = b2.get("average", 0) or 0
+    sr2 = b2.get("strike_rate", 0) or 0
+    fours2 = b2.get("fours", 0) or 0
+    sixes2 = b2.get("sixes", 0) or 0
+    balls2 = b2.get("balls_faced", 1) or 1
+    matches2 = b2.get("matches", 1) or 1
+    runs2 = b2.get("total_runs", 0) or 0
+    not_outs2 = b2.get("not_outs", 0) or 0
+    
+    bd_pct2 = (fours2 + sixes2) / balls2 * 100
+    rpm2 = runs2 / matches2
+    no_pct2 = not_outs2 / matches2 * 100
+
+    # Scale to 0-100 relative to benchmarks
+    s_avg1 = min(100.0, (avg1 / 50.0) * 100.0)
+    s_sr1 = min(100.0, (sr1 / 160.0) * 100.0)
+    s_bd1 = min(100.0, (bd_pct1 / 25.0) * 100.0)
+    s_rpm1 = min(100.0, (rpm1 / 45.0) * 100.0)
+    s_no1 = min(100.0, (no_pct1 / 40.0) * 100.0)
+    
+    s_avg2 = min(100.0, (avg2 / 50.0) * 100.0)
+    s_sr2 = min(100.0, (sr2 / 160.0) * 100.0)
+    s_bd2 = min(100.0, (bd_pct2 / 25.0) * 100.0)
+    s_rpm2 = min(100.0, (rpm2 / 45.0) * 100.0)
+    s_no2 = min(100.0, (no_pct2 / 40.0) * 100.0)
+    
+    categories = ['Average', 'Strike Rate', 'Boundary %', 'Runs/Match', 'Not Out %']
+    
+    fig = go.Figure()
+    fig.add_trace(go.Scatterpolar(
+        r=[s_avg1, s_sr1, s_bd1, s_rpm1, s_no1, s_avg1],
+        theta=categories + [categories[0]],
+        fill='toself',
+        name=b1["name"],
+        line_color=COLOR_P1,
+        text=[f"Avg: {avg1}", f"SR: {sr1}", f"Boundaries: {bd_pct1:.1f}%", f"Runs/Match: {rpm1:.1f}", f"Not Out: {no_pct1:.1f}%", f"Avg: {avg1}"],
+        hovertemplate="%{text}"
+    ))
+    
+    fig.add_trace(go.Scatterpolar(
+        r=[s_avg2, s_sr2, s_bd2, s_rpm2, s_no2, s_avg2],
+        theta=categories + [categories[0]],
+        fill='toself',
+        name=b2["name"],
+        line_color="#00bcd4" if COLOR_P2 == "#0f3460" else COLOR_P2,  # use cyan for better contrast if COLOR_P2 is dark
+        text=[f"Avg: {avg2}", f"SR: {sr2}", f"Boundaries: {bd_pct2:.1f}%", f"Runs/Match: {rpm2:.1f}", f"Not Out: {no_pct2:.1f}%", f"Avg: {avg2}"],
+        hovertemplate="%{text}"
+    ))
+    
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, 100],
+                showticklabels=False
+            )
+        ),
+        showlegend=True,
+        template="plotly_dark",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        margin=dict(t=40, b=40, l=40, r=40),
+        height=400,
+    )
+    return fig
+
+def render_bowling_radar(bowl1, bowl2):
+    # P1
+    w1 = bowl1.get("wickets", 0) or 0
+    m1 = bowl1.get("matches", 1) or 1
+    econ1 = bowl1.get("economy", 8.0) or 8.0
+    avg1 = bowl1.get("bowling_average", 30.0) or 30.0
+    sr1 = bowl1.get("bowling_strike_rate", 20.0) or 20.0
+    overs1 = bowl1.get("overs_bowled", 0.0) or 0.0
+    
+    wpm1 = w1 / m1
+    opm1 = overs1 / m1
+    
+    # P2
+    w2 = bowl2.get("wickets", 0) or 0
+    m2 = bowl2.get("matches", 1) or 1
+    econ2 = bowl2.get("economy", 8.0) or 8.0
+    avg2 = bowl2.get("bowling_average", 30.0) or 30.0
+    sr2 = bowl2.get("bowling_strike_rate", 20.0) or 20.0
+    overs2 = bowl2.get("overs_bowled", 0.0) or 0.0
+    
+    wpm2 = w2 / m2
+    opm2 = overs2 / m2
+
+    # Scale to 0-100 relative to benchmarks
+    s_wpm1 = min(100.0, (wpm1 / 1.5) * 100.0)
+    s_econ1 = min(100.0, max(0.0, (12.0 - econ1) / (12.0 - 6.5) * 100.0))
+    s_avg1 = min(100.0, max(0.0, (40.0 - avg1) / (40.0 - 20.0) * 100.0))
+    s_sr1 = min(100.0, max(0.0, (30.0 - sr1) / (30.0 - 15.0) * 100.0))
+    s_opm1 = min(100.0, (opm1 / 4.0) * 100.0)
+    
+    s_wpm2 = min(100.0, (wpm2 / 1.5) * 100.0)
+    s_econ2 = min(100.0, max(0.0, (12.0 - econ2) / (12.0 - 6.5) * 100.0))
+    s_avg2 = min(100.0, max(0.0, (40.0 - avg2) / (40.0 - 20.0) * 100.0))
+    s_sr2 = min(100.0, max(0.0, (30.0 - sr2) / (30.0 - 15.0) * 100.0))
+    s_opm2 = min(100.0, (opm2 / 4.0) * 100.0)
+    
+    categories = ['Wickets/Match', 'Economy', 'Average', 'Strike Rate', 'Overs/Match']
+    
+    fig = go.Figure()
+    fig.add_trace(go.Scatterpolar(
+        r=[s_wpm1, s_econ1, s_avg1, s_sr1, s_opm1, s_wpm1],
+        theta=categories + [categories[0]],
+        fill='toself',
+        name=bowl1["name"],
+        line_color=COLOR_P1,
+        text=[f"Wickets/Match: {wpm1:.2f}", f"Economy: {econ1}", f"Avg: {avg1}", f"SR: {sr1}", f"Overs/Match: {opm1:.1f}", f"Wickets/Match: {wpm1:.2f}"],
+        hovertemplate="%{text}"
+    ))
+    
+    fig.add_trace(go.Scatterpolar(
+        r=[s_wpm2, s_econ2, s_avg2, s_sr2, s_opm2, s_wpm2],
+        theta=categories + [categories[0]],
+        fill='toself',
+        name=bowl2["name"],
+        line_color="#00bcd4" if COLOR_P2 == "#0f3460" else COLOR_P2,  # use cyan for better contrast if COLOR_P2 is dark
+        text=[f"Wickets/Match: {wpm2:.2f}", f"Economy: {econ2}", f"Avg: {avg2}", f"SR: {sr2}", f"Overs/Match: {opm2:.1f}", f"Wickets/Match: {wpm2:.2f}"],
+        hovertemplate="%{text}"
+    ))
+    
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, 100],
+                showticklabels=False
+            )
+        ),
+        showlegend=True,
+        template="plotly_dark",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        margin=dict(t=40, b=40, l=40, r=40),
+        height=400,
+    )
+    return fig
+
 with st.sidebar:
     st.markdown("### 🏏 IPLytics")
     st.caption("Comparisons")
@@ -422,44 +579,10 @@ with tab1:
                                 with row[j]:
                                     val = b2[key]
                                     st.metric(label, f"{val:,}" if fmt_comma else f"{val}")
-
-                    st.divider()
-
-                    # --- Grouped Bar Chart ---
-                    st.markdown("#### 📈 Head-to-Head Comparison")
-
-                    compare_stats = ["total_runs", "average", "strike_rate", "fifties", "hundreds", "sixes"]
-                    labels = ["Runs", "Average", "Strike Rate", "50s", "100s", "Sixes"]
-
-                    fig = go.Figure()
-                    fig.add_trace(go.Bar(
-                        x=labels,
-                        y=[b1[s] for s in compare_stats],
-                        name=b1["name"],
-                        marker_color=COLOR_P1,
-                        text=[b1[s] for s in compare_stats],
-                        textposition="outside",
-                        textfont=dict(color="#ccd6f6", size=10),
-                    ))
-                    fig.add_trace(go.Bar(
-                        x=labels,
-                        y=[b2[s] for s in compare_stats],
-                        name=b2["name"],
-                        marker_color=COLOR_P2,
-                        text=[b2[s] for s in compare_stats],
-                        textposition="outside",
-                        textfont=dict(color="#ccd6f6", size=10),
-                    ))
-
-                    fig.update_layout(
-                        template="plotly_dark",
-                        plot_bgcolor="rgba(0,0,0,0)",
-                        paper_bgcolor="rgba(0,0,0,0)",
-                        barmode="group",
-                        height=450, margin=dict(t=30, b=40),
-                        font=dict(color="#8892b0"),
-                        legend=dict(font=dict(color="#ccd6f6")),
-                    )
+                    
+                    # --- Batting Radar Chart ---
+                    st.markdown("#### 🕸️ Player Performance Radar")
+                    fig = render_batting_radar(b1, b2)
                     st.plotly_chart(fig, use_container_width=True)
 
                 with comp_tab2:
@@ -517,41 +640,9 @@ with tab1:
 
                         st.divider()
 
-                        # --- Grouped Bar Chart ---
-                        st.markdown("#### 📈 Bowling Comparison Chart")
-
-                        bowl_compare_stats = ["wickets", "economy", "bowling_average", "bowling_strike_rate"]
-                        bowl_labels = ["Wickets", "Economy", "Avg", "SR"]
-
-                        fig_bowl = go.Figure()
-                        fig_bowl.add_trace(go.Bar(
-                            x=bowl_labels,
-                            y=[bowl1[s] for s in bowl_compare_stats],
-                            name=bowl1["name"],
-                            marker_color=COLOR_P1,
-                            text=[bowl1[s] for s in bowl_compare_stats],
-                            textposition="outside",
-                            textfont=dict(color="#ccd6f6", size=10),
-                        ))
-                        fig_bowl.add_trace(go.Bar(
-                            x=bowl_labels,
-                            y=[bowl2[s] for s in bowl_compare_stats],
-                            name=bowl2["name"],
-                            marker_color=COLOR_P2,
-                            text=[bowl2[s] for s in bowl_compare_stats],
-                            textposition="outside",
-                            textfont=dict(color="#ccd6f6", size=10),
-                        ))
-
-                        fig_bowl.update_layout(
-                            template="plotly_dark",
-                            plot_bgcolor="rgba(0,0,0,0)",
-                            paper_bgcolor="rgba(0,0,0,0)",
-                            barmode="group",
-                            height=450, margin=dict(t=30, b=40),
-                            font=dict(color="#8892b0"),
-                            legend=dict(font=dict(color="#ccd6f6")),
-                        )
+                        # --- Bowling Radar Chart ---
+                        st.markdown("#### 🕸️ Player Bowling Radar")
+                        fig_bowl = render_bowling_radar(bowl1, bowl2)
                         st.plotly_chart(fig_bowl, use_container_width=True)
 
         elif p1 == p2:

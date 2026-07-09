@@ -14,6 +14,10 @@ import plotly.graph_objects as go
 
 from frontend.api_client import get_venues, get_venue_stats
 
+def clean_html(html_str: str) -> str:
+    """Strip leading/trailing whitespace from each line to prevent Streamlit rendering issues."""
+    return "\n".join([line.strip() for line in html_str.strip().splitlines()])
+
 # --- Page Config ---
 st.set_page_config(
     page_title="Venue Analytics | IPLytics",
@@ -156,6 +160,132 @@ if selected:
         st.metric("Highest Total", f"{stats['highest_total']}")
     with col5:
         st.metric("Lowest Total", f"{stats['lowest_total']}")
+
+    st.divider()
+
+    # =============================================
+    # TACTICAL PITCH & BOUNDARY GUIDE
+    # =============================================
+    st.markdown("#### 🏟️ Pitch & Boundary Tactical Guide")
+    
+    stadium_details = {
+        "wankhede": {
+            "soil": "🔴 Red Soil (High bounce, extra pace)",
+            "off": 64, "leg": 68, "str": 72,
+            "pace": 68, "spin": 32,
+            "desc": "Wankhede features a quick outfield and true bounce, making it highly batting-friendly. Pace bowlers get swing early on, but spin becomes hard to control due to short boundaries."
+        },
+        "chidambaram": {
+            "soil": "⚫ Black Soil (Slow, turns, low bounce)",
+            "off": 66, "leg": 66, "str": 70,
+            "pace": 45, "spin": 55,
+            "desc": "Chepauk is famous for dry, abrasive pitches that assist spinners and slower bowlers. Batting first is generally preferred as the pitch slows down significantly in the second innings."
+        },
+        "chinnaswamy": {
+            "soil": "🔴 Red Soil (Fast, high bounce, flat deck)",
+            "off": 60, "leg": 62, "str": 65,
+            "pace": 65, "spin": 35,
+            "desc": "A batsman's paradise with very short boundaries. High altitude and flat pitches mean huge totals are common and no target is safe. Spinners must bowl defensive lines."
+        },
+        "eden gardens": {
+            "soil": "🔴⚫ Mixed Soil (Balanced bounce & turn)",
+            "off": 66, "leg": 68, "str": 72,
+            "pace": 60, "spin": 40,
+            "desc": "Historically spin-friendly, but has transitioned into a fast, bouncing track with a lightning-fast outfield. Both pacers and spinners get assistance depending on the time of day."
+        },
+        "rajiv gandhi": {
+            "soil": "⚫ Black Soil (Dry, aids turn and seam)",
+            "off": 68, "leg": 70, "str": 75,
+            "pace": 58, "spin": 42,
+            "desc": "Uppal has relatively large boundaries that encourage bowlers to use flight and variations. A balanced pitch that provides equal opportunity to both batsmen and disciplined bowlers."
+        },
+        "arun jaitley": {
+            "soil": "⚫ Black Soil (Low bounce, aids spin & slow cutters)",
+            "off": 63, "leg": 65, "str": 68,
+            "pace": 52, "spin": 48,
+            "desc": "Kotla has short boundaries but a slow, low pitch. Batsmen can score heavily if they get in, but spinners dominate the middle overs as the ball stops and grips."
+        },
+        "sawai mansingh": {
+            "soil": "⚫ Black Soil (Heavy clay, balanced bounce)",
+            "off": 70, "leg": 72, "str": 78,
+            "pace": 50, "spin": 50,
+            "desc": "Featuring massive square and straight boundaries, boundary-hitting is difficult here. Running between wickets is crucial, and spin bowlers are highly effective using the big outfield."
+        },
+        "narendra modi": {
+            "soil": "🔴⚫ Multi-Soil Pitches (Varied bounce, lightning outfield)",
+            "off": 72, "leg": 74, "str": 80,
+            "pace": 70, "spin": 30,
+            "desc": "The world's largest stadium features extra bounce and speed. Wide square boundaries make six-hitting a challenge, rewarding bowlers who extract seam movement and bowl hard lengths."
+        },
+        "ekana": {
+            "soil": "⚫ Black Soil (Extremely dry, slow, dust-bowl potential)",
+            "off": 68, "leg": 72, "str": 78,
+            "pace": 40, "spin": 60,
+            "desc": "A slow-turn pitch where spinners are lethal. Wickets fall to flight and grip. Scoring runs is hard work, making 140-150 highly competitive scores."
+        }
+    }
+
+    venue_key = "generic"
+    venue_lower = stats['venue'].lower()
+    for k in stadium_details.keys():
+        if k in venue_lower:
+            venue_key = k
+            break
+            
+    details = stadium_details.get(venue_key, {
+        "soil": "🔴⚫ Clay Soil (Standard balanced pitch)",
+        "off": 67, "leg": 68, "str": 73,
+        "pace": 58, "spin": 42,
+        "desc": "A standard balanced IPL pitch offering equal contest between bat and ball. Pace bowlers find movement early under lights, while spinners get grip during the middle overs."
+    })
+
+    col_pitch, col_boundary = st.columns([1, 1])
+
+    with col_pitch:
+        st.markdown(clean_html(f"""
+        <div style="background: rgba(26, 26, 46, 0.4); border: 1px solid rgba(233, 69, 96, 0.15); border-radius: 12px; padding: 1.25rem; height: 350px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <h5 style="margin: 0 0 0.75rem 0; color: #e94560; font-weight: 700; font-size: 1.15rem;">📊 Pitch Conditions</h5>
+                <div style="margin-bottom: 0.75rem; font-size: 0.95rem; color: #ccd6f6;">🧱 Soil Type: <strong>{details['soil']}</strong></div>
+                <p style="font-size: 0.88rem; color: #8892b0; line-height: 1.55; margin: 0;">{details['desc']}</p>
+            </div>
+            <div style="margin-top: 1rem; border-top: 1px solid rgba(233, 69, 96, 0.1); padding-top: 0.75rem;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 0.25rem; color: #ccd6f6;">
+                    <span>🔥 Pace Wickets split:</span>
+                    <strong>{details['pace']}%</strong>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 0.75rem;">
+                    <div style="background: #e94560; width: {details['pace']}%; height: 100%;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 0.25rem; color: #ccd6f6;">
+                    <span>🌀 Spin Wickets split:</span>
+                    <strong>{details['spin']}%</strong>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div style="background: #f5a623; width: {details['spin']}%; height: 100%;"></div>
+                </div>
+            </div>
+        </div>
+        """), unsafe_allow_html=True)
+
+    with col_boundary:
+        st.markdown(clean_html(f"""
+        <div style="background: rgba(26, 26, 46, 0.4); border: 1px solid rgba(233, 69, 96, 0.15); border-radius: 12px; padding: 1.25rem; height: 350px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+            <h5 style="margin: 0; color: #f5a623; position: absolute; top: 1.25rem; left: 1.25rem; font-weight: 700; font-size: 1.15rem;">📐 Boundary Lengths</h5>
+            <svg viewBox="0 0 200 200" width="180" height="180" style="margin-top: 1.5rem;">
+                <circle cx="100" cy="100" r="85" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2" stroke-dasharray="4"/>
+                <ellipse cx="100" cy="100" rx="80" ry="75" fill="rgba(15, 52, 96, 0.1)" stroke="#e94560" stroke-width="2" />
+                <ellipse cx="100" cy="100" rx="45" ry="40" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.5" stroke-dasharray="3"/>
+                <rect x="96" y="85" width="8" height="30" fill="#f5a623" opacity="0.8" rx="1"/>
+                <line x1="100" y1="85" x2="100" y2="25" stroke="#ccd6f6" stroke-width="1" stroke-dasharray="2"/>
+                <text x="100" y="20" fill="#ccd6f6" font-size="8" text-anchor="middle" font-weight="bold">Straight: {details['str']}m</text>
+                <line x1="96" y1="100" x2="20" y2="100" stroke="#ccd6f6" stroke-width="1" stroke-dasharray="2"/>
+                <text x="15" y="103" fill="#ccd6f6" font-size="8" text-anchor="end" font-weight="bold">Off: {details['off']}m</text>
+                <line x1="104" y1="100" x2="180" y2="100" stroke="#ccd6f6" stroke-width="1" stroke-dasharray="2"/>
+                <text x="185" y="103" fill="#ccd6f6" font-size="8" text-anchor="start" font-weight="bold">Leg: {details['leg']}m</text>
+            </svg>
+        </div>
+        """), unsafe_allow_html=True)
 
     st.divider()
 
