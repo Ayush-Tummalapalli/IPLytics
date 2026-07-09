@@ -300,6 +300,14 @@ def main() -> None:
     with col3:
         st.info("🤖 **AI-powered** RAG assistant using Gemini")
 
+    col4, col5, col6 = st.columns(3)
+    with col4:
+        st.info("🏟️ **1,100+ Matches** mapped with boundary lengths & soil profiles")
+    with col5:
+        st.info("⚡ **On-the-Fly SQL** aggregates with zero pre-computed latency")
+    with col6:
+        st.info("🏆 **Trophy Cabinet** tracking championship captains & cap awards")
+
     # --- Sidebar ---
     with st.sidebar:
         st.markdown("### 🏏 IPLytics")
