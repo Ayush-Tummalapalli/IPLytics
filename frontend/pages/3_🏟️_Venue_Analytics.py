@@ -171,55 +171,55 @@ if selected:
     stadium_details = {
         "wankhede": {
             "soil": "🔴 Red Soil (High bounce, extra pace)",
-            "off": 64, "leg": 68, "str": 72,
+            "off": 64, "leg": 68, "str": 72, "behind": 58,
             "pace": 68, "spin": 32,
             "desc": "Wankhede features a quick outfield and true bounce, making it highly batting-friendly. Pace bowlers get swing early on, but spin becomes hard to control due to short boundaries."
         },
         "chidambaram": {
             "soil": "⚫ Black Soil (Slow, turns, low bounce)",
-            "off": 66, "leg": 66, "str": 70,
+            "off": 66, "leg": 66, "str": 70, "behind": 60,
             "pace": 45, "spin": 55,
             "desc": "Chepauk is famous for dry, abrasive pitches that assist spinners and slower bowlers. Batting first is generally preferred as the pitch slows down significantly in the second innings."
         },
         "chinnaswamy": {
             "soil": "🔴 Red Soil (Fast, high bounce, flat deck)",
-            "off": 60, "leg": 62, "str": 65,
+            "off": 60, "leg": 62, "str": 65, "behind": 56,
             "pace": 65, "spin": 35,
             "desc": "A batsman's paradise with very short boundaries. High altitude and flat pitches mean huge totals are common and no target is safe. Spinners must bowl defensive lines."
         },
         "eden gardens": {
             "soil": "🔴⚫ Mixed Soil (Balanced bounce & turn)",
-            "off": 66, "leg": 68, "str": 72,
+            "off": 66, "leg": 68, "str": 72, "behind": 60,
             "pace": 60, "spin": 40,
             "desc": "Historically spin-friendly, but has transitioned into a fast, bouncing track with a lightning-fast outfield. Both pacers and spinners get assistance depending on the time of day."
         },
         "rajiv gandhi": {
             "soil": "⚫ Black Soil (Dry, aids turn and seam)",
-            "off": 68, "leg": 70, "str": 75,
+            "off": 68, "leg": 70, "str": 75, "behind": 62,
             "pace": 58, "spin": 42,
             "desc": "Uppal has relatively large boundaries that encourage bowlers to use flight and variations. A balanced pitch that provides equal opportunity to both batsmen and disciplined bowlers."
         },
         "arun jaitley": {
             "soil": "⚫ Black Soil (Low bounce, aids spin & slow cutters)",
-            "off": 63, "leg": 65, "str": 68,
+            "off": 63, "leg": 65, "str": 68, "behind": 57,
             "pace": 52, "spin": 48,
             "desc": "Kotla has short boundaries but a slow, low pitch. Batsmen can score heavily if they get in, but spinners dominate the middle overs as the ball stops and grips."
         },
         "sawai mansingh": {
             "soil": "⚫ Black Soil (Heavy clay, balanced bounce)",
-            "off": 70, "leg": 72, "str": 78,
+            "off": 70, "leg": 72, "str": 78, "behind": 65,
             "pace": 50, "spin": 50,
             "desc": "Featuring massive square and straight boundaries, boundary-hitting is difficult here. Running between wickets is crucial, and spin bowlers are highly effective using the big outfield."
         },
         "narendra modi": {
             "soil": "🔴⚫ Multi-Soil Pitches (Varied bounce, lightning outfield)",
-            "off": 72, "leg": 74, "str": 80,
+            "off": 72, "leg": 74, "str": 80, "behind": 68,
             "pace": 70, "spin": 30,
             "desc": "The world's largest stadium features extra bounce and speed. Wide square boundaries make six-hitting a challenge, rewarding bowlers who extract seam movement and bowl hard lengths."
         },
         "ekana": {
             "soil": "⚫ Black Soil (Extremely dry, slow, dust-bowl potential)",
-            "off": 68, "leg": 72, "str": 78,
+            "off": 68, "leg": 72, "str": 78, "behind": 63,
             "pace": 40, "spin": 60,
             "desc": "A slow-turn pitch where spinners are lethal. Wickets fall to flight and grip. Scoring runs is hard work, making 140-150 highly competitive scores."
         }
@@ -234,7 +234,7 @@ if selected:
             
     details = stadium_details.get(venue_key, {
         "soil": "🔴⚫ Clay Soil (Standard balanced pitch)",
-        "off": 67, "leg": 68, "str": 73,
+        "off": 67, "leg": 68, "str": 73, "behind": 61,
         "pace": 58, "spin": 42,
         "desc": "A standard balanced IPL pitch offering equal contest between bat and ball. Pace bowlers find movement early under lights, while spinners get grip during the middle overs."
     })
@@ -312,6 +312,12 @@ if selected:
                     <circle cx="260" cy="125" r="3" fill="#f5a623" />
                     <rect x="265" y="115" width="55" height="20" rx="4" fill="rgba(15, 15, 35, 0.9)" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1"/>
                     <text x="292" y="128" fill="#ccd6f6" font-size="9" text-anchor="middle" font-weight="bold" font-family="Outfit">Leg: {details['leg']}m</text>
+                    
+                    <!-- Behind wickets (Bottom) -->
+                    <line x1="170" y1="140" x2="170" y2="197" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="3"/>
+                    <circle cx="170" cy="197" r="3" fill="#f5a623" />
+                    <rect x="125" y="208" width="90" height="20" rx="4" fill="rgba(15, 15, 35, 0.9)" stroke="rgba(245, 166, 35, 0.5)" stroke-width="1"/>
+                    <text x="170" y="221" fill="#f5a623" font-size="9" text-anchor="middle" font-weight="bold" font-family="Outfit">Behind: {details['behind']}m</text>
                 </svg>
             </div>
         </div>
