@@ -126,7 +126,7 @@ def render_championships_glory_panel(titles: list[dict], team_name: str) -> None
         2022: "Hardik Pandya",
         2023: "MS Dhoni",
         2024: "Shreyas Iyer",
-        2025: "Faf du Plessis"
+        2025: "Rajat Patidar"
     }
 
     html_lines = [
