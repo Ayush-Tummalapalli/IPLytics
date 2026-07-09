@@ -185,6 +185,14 @@ with tab1:
             value=f"{du.get('value', 0)} Ducks",
             description=f"**{du.get('player')}** has been dismissed for a duck (score of 0 runs) the most times. While a tough stat, it often reflects a long career of aggressive top-order batting!"
         )
+
+        render_card(
+            icon="🥎",
+            badge="Activity Stat",
+            title="Total Deliveries Faced",
+            value=f"{totals.get('deliveries', 0):,} Balls",
+            description="The overall number of legal and extra balls bowled to batters across 18 seasons of action-packed tournament history."
+        )
         
     with col2:
         mc = records.get("most_centuries", {})
@@ -221,14 +229,6 @@ with tab1:
             title="Most Career Fours",
             value=f"{cfours.get('value', 0):,} Fours",
             description=f"**{cfours.get('player')}** holds the record for hitting the most fours in IPL history, routinely finding gaps in the field with exquisite timing."
-        )
-        
-        render_card(
-            icon="🥎",
-            badge="Activity Stat",
-            title="Total Deliveries Faced",
-            value=f"{totals.get('deliveries', 0):,} Balls",
-            description="The overall number of legal and extra balls bowled to batters across 18 seasons of action-packed tournament history."
         )
         
         # Add a custom chart showing Batting boundaries share
