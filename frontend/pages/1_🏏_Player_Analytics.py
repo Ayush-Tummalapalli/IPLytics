@@ -509,11 +509,11 @@ def generate_trophy_cabinet_html(batting: dict, bowling: dict, orange_seasons: l
             "border": "rgba(255,255,255,0.05)"
         })
 
-    # Generate custom cleaned HTML
+        # Generate custom cleaned HTML
     html_lines = [
-        '<div style="background: rgba(26, 26, 46, 0.4); border: 1px solid rgba(245, 166, 35, 0.15); border-radius: 12px; padding: 1.25rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 1.5rem;">',
-        '<h5 style="margin: 0 0 0.75rem 0; color: #f5a623; font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">🏆 Career Achievements</h5>',
-        '<div style="display: flex; flex-direction: column; gap: 0.5rem;">'
+        '<div style="background: rgba(26, 26, 46, 0.4); border: 1px solid rgba(245, 166, 35, 0.15); border-radius: 12px; padding: 1.25rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-top: 1.5rem; width: 100%;">',
+        '<h5 style="margin: 0 0 1rem 0; color: #f5a623; font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; justify-content: center;">🏆 Career Achievements</h5>',
+        '<div style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; width: 100%;">'
     ]
     
     for b in badges:
@@ -523,14 +523,14 @@ def generate_trophy_cabinet_html(batting: dict, bowling: dict, orange_seasons: l
         bg_style = f"background: {b['color']}; border: 1px solid {b['border']};"
         
         html_lines.append(f"""
-        <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0.6rem; border-radius: 8px; {bg_style} box-shadow: {shadow}; opacity: {opacity}; transition: all 0.3s ease;">
+        <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0.8rem; border-radius: 8px; {bg_style} box-shadow: {shadow}; opacity: {opacity}; transition: all 0.3s ease;">
             <span style="font-size: 1.1rem;">{b['emoji']}</span>
-            <span style="font-size: 0.82rem; {text_style}">{b['label']}</span>
+            <span style="font-size: 0.85rem; {text_style}">{b['label']}</span>
         </div>
         """)
         
     html_lines.append('</div></div>')
-    return "".join(html_lines)
+    return "".join(html_lines).replace("\n", "").replace("\r", "").strip()
 
 
 # ── Main page layout ───────────────────────────────────────────────
@@ -660,9 +660,7 @@ def main() -> None:
         </div>
         """, unsafe_allow_html=True)
         
-        # Render visual achievements cabinet
-        cabinet_html = generate_trophy_cabinet_html(batting, bowling, orange_seasons, purple_seasons)
-        st.markdown(cabinet_html, unsafe_allow_html=True)
+
         
 
     # ── Metric cards ──
@@ -682,6 +680,10 @@ def main() -> None:
 
     st.divider()
     render_consistency_charts(batting, bowling, selected_player)
+
+    # Render visual achievements cabinet
+    cabinet_html = generate_trophy_cabinet_html(batting, bowling, orange_seasons, purple_seasons)
+    st.markdown(cabinet_html, unsafe_allow_html=True)
 
 
 main()
