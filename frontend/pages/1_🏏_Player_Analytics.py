@@ -31,7 +31,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 
-from frontend.api_client import get_players, get_player_stats
+from frontend.api_client import get_players, get_player_stats, get_ipl_leaders
 
 # ── IPL-inspired color palette ──────────────────────────────────────
 # Centralised here so every chart in this page is visually consistent.
@@ -55,6 +55,12 @@ def load_players() -> list[str]:
 def load_player_stats(name: str) -> dict | None:
     """Fetch a single player's stats and cache for 5 minutes."""
     return get_player_stats(name)
+
+
+@st.cache_data(ttl=600)
+def load_ipl_leaders() -> dict | None:
+    """Fetch the IPL Orange & Purple cap winners."""
+    return get_ipl_leaders()
 
 
 # ── Page configuration ──────────────────────────────────────────────
@@ -363,6 +369,170 @@ def render_consistency_charts(batting: dict, bowling: dict, player_name: str) ->
             st.info("No bowling innings data available to analyze consistency.")
 
 
+def generate_trophy_cabinet_html(batting: dict, bowling: dict, orange_seasons: list[str], purple_seasons: list[str]) -> str:
+    """Generate HTML for visual trophy cabinet achievements."""
+    runs = batting.get("total_runs", 0) or 0
+    wkts = bowling.get("wickets", 0) or 0
+    sixes = batting.get("sixes", 0) or 0
+    hundreds = batting.get("hundreds", 0) or 0
+    highest = batting.get("highest_score", 0) or 0
+    
+    # Calculate 5-wicket hauls from bowling wickets_list
+    wkts_list = bowling.get("wickets_list", [])
+    five_wkt_hauls = sum(1 for w in wkts_list if w >= 5) if wkts_list else 0
+
+    badges = []
+    
+    # Orange Cap
+    if orange_seasons:
+        badges.append({
+            "label": f"Orange Cap ({', '.join(orange_seasons)})",
+            "emoji": "👑",
+            "unlocked": True,
+            "color": "linear-gradient(135deg, #f5a623 0%, #d4af37 100%)",
+            "border": "#f5a623"
+        })
+    else:
+        badges.append({
+            "label": "Orange Cap Winner",
+            "emoji": "👑",
+            "unlocked": False,
+            "color": "rgba(255,255,255,0.02)",
+            "border": "rgba(255,255,255,0.05)"
+        })
+        
+    # Purple Cap
+    if purple_seasons:
+        badges.append({
+            "label": f"Purple Cap ({', '.join(purple_seasons)})",
+            "emoji": "👑",
+            "unlocked": True,
+            "color": "linear-gradient(135deg, #b085f5 0%, #8e2de2 100%)",
+            "border": "#b085f5"
+        })
+    else:
+        badges.append({
+            "label": "Purple Cap Winner",
+            "emoji": "👑",
+            "unlocked": False,
+            "color": "rgba(255,255,255,0.02)",
+            "border": "rgba(255,255,255,0.05)"
+        })
+
+    # 5000+ Runs Club
+    if runs >= 5000:
+        badges.append({
+            "label": f"5000+ Runs Club ({runs:,} runs)",
+            "emoji": "🏏",
+            "unlocked": True,
+            "color": "linear-gradient(135deg, #e94560 0%, #ff6b6b 100%)",
+            "border": "#e94560"
+        })
+    else:
+        badges.append({
+            "label": "5000+ Runs Club",
+            "emoji": "🏏",
+            "unlocked": False,
+            "color": "rgba(255,255,255,0.02)",
+            "border": "rgba(255,255,255,0.05)"
+        })
+
+    # 200+ Sixes Club
+    if sixes >= 200:
+        badges.append({
+            "label": f"200+ Sixes Club ({sixes} sixes)",
+            "emoji": "💥",
+            "unlocked": True,
+            "color": "linear-gradient(135deg, #ff9f43 0%, #ff9f43bb 100%)",
+            "border": "#ff9f43"
+        })
+    else:
+        badges.append({
+            "label": "200+ Sixes Club",
+            "emoji": "💥",
+            "unlocked": False,
+            "color": "rgba(255,255,255,0.02)",
+            "border": "rgba(255,255,255,0.05)"
+        })
+
+    # 150+ Wickets Club
+    if wkts >= 150:
+        badges.append({
+            "label": f"150+ Wkts Club ({wkts} wickets)",
+            "emoji": "🎳",
+            "unlocked": True,
+            "color": "linear-gradient(135deg, #00d2d3 0%, #01a3a4 100%)",
+            "border": "#00d2d3"
+        })
+    else:
+        badges.append({
+            "label": "150+ Wickets Club",
+            "emoji": "🎳",
+            "unlocked": False,
+            "color": "rgba(255,255,255,0.02)",
+            "border": "rgba(255,255,255,0.05)"
+        })
+
+    # Centurion
+    if hundreds >= 1 or highest >= 100:
+        badges.append({
+            "label": f"Centurion ({max(hundreds, 1)} x 100s)",
+            "emoji": "💯",
+            "unlocked": True,
+            "color": "linear-gradient(135deg, #ee5253 0%, #ff6b6b 100%)",
+            "border": "#ee5253"
+        })
+    else:
+        badges.append({
+            "label": "Centurion Club",
+            "emoji": "💯",
+            "unlocked": False,
+            "color": "rgba(255,255,255,0.02)",
+            "border": "rgba(255,255,255,0.05)"
+        })
+
+    # 5-Wicket Haul
+    if five_wkt_hauls >= 1:
+        badges.append({
+            "label": f"5-Wkt Haul ({five_wkt_hauls} x 5-fers)",
+            "emoji": "🖐️",
+            "unlocked": True,
+            "color": "linear-gradient(135deg, #10ac84 0%, #1dd1a1 100%)",
+            "border": "#10ac84"
+        })
+    else:
+        badges.append({
+            "label": "5-Wicket Haul Club",
+            "emoji": "🖐️",
+            "unlocked": False,
+            "color": "rgba(255,255,255,0.02)",
+            "border": "rgba(255,255,255,0.05)"
+        })
+
+    # Generate custom cleaned HTML
+    html_lines = [
+        '<div style="background: rgba(26, 26, 46, 0.4); border: 1px solid rgba(245, 166, 35, 0.15); border-radius: 12px; padding: 1.25rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 1.5rem;">',
+        '<h5 style="margin: 0 0 0.75rem 0; color: #f5a623; font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">🏆 Career Achievements</h5>',
+        '<div style="display: flex; flex-direction: column; gap: 0.5rem;">'
+    ]
+    
+    for b in badges:
+        opacity = "1" if b["unlocked"] else "0.35"
+        shadow = f"0 2px 8px {b['border']}30" if b["unlocked"] else "none"
+        text_style = "color: #ffffff; font-weight: 600;" if b["unlocked"] else "color: #8892b0; text-decoration: line-through; opacity: 0.7;"
+        bg_style = f"background: {b['color']}; border: 1px solid {b['border']};"
+        
+        html_lines.append(f"""
+        <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0.6rem; border-radius: 8px; {bg_style} box-shadow: {shadow}; opacity: {opacity}; transition: all 0.3s ease;">
+            <span style="font-size: 1.1rem;">{b['emoji']}</span>
+            <span style="font-size: 0.82rem; {text_style}">{b['label']}</span>
+        </div>
+        """)
+        
+    html_lines.append('</div></div>')
+    return "".join(html_lines)
+
+
 # ── Main page layout ───────────────────────────────────────────────
 
 def main() -> None:
@@ -428,6 +598,18 @@ def main() -> None:
     has_batted = batting.get("matches", 0) > 0
     has_bowled = bowling.get("matches", 0) > 0
 
+    # ── Fetch Cap Winners ──
+    leaders_data = load_ipl_leaders()
+    orange_seasons = []
+    purple_seasons = []
+    if leaders_data:
+        for cap in leaders_data.get("orange_caps", []):
+            if cap.get("player") == selected_player:
+                orange_seasons.append(str(cap.get("season")))
+        for cap in leaders_data.get("purple_caps", []):
+            if cap.get("player") == selected_player:
+                purple_seasons.append(str(cap.get("season")))
+
     # ── Sidebar Dynamic Profile & suggestions ──
     with st.sidebar:
         # Determine player role dynamically using career stats and stumping records
@@ -477,6 +659,10 @@ def main() -> None:
             <div style="font-size: 0.9rem; color: #ccd6f6;">🎳 Career Wkts: <strong>{bowling.get("wickets", 0)}</strong></div>
         </div>
         """, unsafe_allow_html=True)
+        
+        # Render visual achievements cabinet
+        cabinet_html = generate_trophy_cabinet_html(batting, bowling, orange_seasons, purple_seasons)
+        st.markdown(cabinet_html, unsafe_allow_html=True)
         
 
     # ── Metric cards ──
