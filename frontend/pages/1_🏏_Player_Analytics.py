@@ -562,10 +562,14 @@ def main() -> None:
         return
 
     # ── Player selector ──
+    default_index = 0
+    if "V Kohli" in players:
+        default_index = players.index("V Kohli")
+
     selected_player = st.selectbox(
         "Select a Player",
         options=players,
-        index=0,
+        index=default_index,
         help="Start typing to search for a player by name.",
     )
 
