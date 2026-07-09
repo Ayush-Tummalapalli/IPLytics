@@ -239,28 +239,60 @@ def get_season_champions(session: Session) -> list[dict]:
         .subquery()
     )
     
+    from sqlalchemy.orm import aliased
+    WinnerTeam = aliased(Team)
+    Team1 = aliased(Team)
+    Team2 = aliased(Team)
+    
     # Query details of the final match and its winner
     finals = (
         session.query(
             Match.season,
-            Team.name,
-            Team.short_name,
+            Match.id,
+            WinnerTeam.name.label("winner_name"),
+            WinnerTeam.short_name.label("winner_short"),
+            Team1.name.label("team1_name"),
+            Team2.name.label("team2_name"),
+            Match.winner_id,
+            Match.team1_id,
+            Match.team2_id,
+            Match.result,
+            Match.win_by_runs,
+            Match.win_by_wickets,
             Match.player_of_match,
             Match.venue,
             Match.city
         )
         .join(subq, and_(Match.season == subq.c.season, Match.date == subq.c.max_date))
-        .join(Team, Match.winner_id == Team.id)
+        .join(WinnerTeam, Match.winner_id == WinnerTeam.id)
+        .join(Team1, Match.team1_id == Team1.id)
+        .join(Team2, Match.team2_id == Team2.id)
         .order_by(Match.season.desc())
         .all()
     )
     
     champions = []
     for row in finals:
+        # Opponent is the other team playing in the final
+        opp_name = row.team2_name if row.winner_id == row.team1_id else row.team1_name
+        
+        # Margin string
+        margin = ""
+        if row.result == "runs" and row.win_by_runs > 0:
+            margin = f"won by {row.win_by_runs} runs"
+        elif row.result == "wickets" and row.win_by_wickets > 0:
+            margin = f"won by {row.win_by_wickets} wickets"
+        elif row.result == "tie":
+            margin = "won via Super Over"
+        else:
+            margin = "won"
+            
         champions.append({
             "season": int(row.season),
-            "champion": row.name,
-            "short_name": row.short_name,
+            "champion": row.winner_name,
+            "short_name": row.winner_short,
+            "opponent": opp_name,
+            "margin": margin,
             "player_of_match": row.player_of_match,
             "venue": row.venue,
             "city": row.city

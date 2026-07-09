@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 import streamlit as st
 import plotly.graph_objects as go
 
-from frontend.api_client import get_teams, get_team_stats
+from frontend.api_client import get_teams, get_team_stats, get_ipl_champions
 
 # --- Page Config ---
 st.set_page_config(
@@ -95,6 +95,172 @@ def fetch_team_stats(name):
     return get_team_stats(name)
 
 
+@st.cache_data(ttl=600)
+def fetch_champions():
+    return get_ipl_champions()
+
+
+def render_championships_glory_panel(titles: list[dict], team_name: str) -> None:
+    """Render a horizontal timeline panel of championship final details."""
+    if not titles:
+        return
+        
+    st.markdown("### 🏆 Championship Glory Timeline")
+    
+    # Captain map
+    WINNING_CAPTAINS = {
+        2008: "Shane Warne",
+        2009: "Adam Gilchrist",
+        2010: "MS Dhoni",
+        2011: "MS Dhoni",
+        2012: "Gautam Gambhir",
+        2013: "Rohit Sharma",
+        2014: "Gautam Gambhir",
+        2015: "Rohit Sharma",
+        2016: "David Warner",
+        2017: "Rohit Sharma",
+        2018: "MS Dhoni",
+        2019: "Rohit Sharma",
+        2020: "Rohit Sharma",
+        2021: "MS Dhoni",
+        2022: "Hardik Pandya",
+        2023: "MS Dhoni",
+        2024: "Shreyas Iyer",
+        2025: "Faf du Plessis"
+    }
+
+    html_lines = [
+        '<div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; width: 100%;">'
+    ]
+    
+    for t in sorted(titles, key=lambda x: x["season"]):
+        season = t["season"]
+        captain = WINNING_CAPTAINS.get(season, "Unknown Captain")
+        opponent = t.get("opponent", "Opponent")
+        margin = t.get("margin", "won")
+        pom = t.get("player_of_match", "N/A")
+        
+        html_lines.append(f"""
+        <div style="flex: 1 1 280px; min-width: 250px; background: linear-gradient(135deg, #1a1a2e 0%, #2a2010 100%); border: 1px solid rgba(245, 166, 35, 0.35); border-radius: 12px; padding: 1.25rem; box-shadow: 0 4px 15px rgba(245, 166, 35, 0.15); transition: transform 0.3s ease;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <span style="font-size: 1.5rem; font-weight: 800; color: #f5a623;">🏆 {season}</span>
+                <span style="font-size: 0.75rem; background: rgba(245, 166, 35, 0.15); color: #f5a623; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: bold;">CHAMPIONS</span>
+            </div>
+            <div style="font-size: 0.9rem; color: #ccd6f6; margin-bottom: 0.4rem;">👨‍✈️ Captain: <strong style="color: #ffffff;">{captain}</strong></div>
+            <div style="font-size: 0.88rem; color: #ccd6f6; margin-bottom: 0.4rem;">⚔️ Final: {margin} vs <strong>{opponent}</strong></div>
+            <div style="font-size: 0.85rem; color: #8892b0;">🌟 Final POM: <strong style="color: #ccd6f6;">{pom}</strong></div>
+        </div>
+        """)
+        
+    html_lines.append("</div>")
+    st.markdown("".join(html_lines).replace("\n", "").replace("\r", "").strip(), unsafe_allow_html=True)
+    st.divider()
+
+
+def render_home_away_split(home_away: dict, team_name: str) -> None:
+    """Render a side-by-side dashboard comparing home vs away performance."""
+    if not home_away:
+        return
+        
+    home = home_away.get("home", {"matches": 0, "wins": 0, "losses": 0, "win_pct": 0.0})
+    away = home_away.get("away", {"matches": 0, "wins": 0, "losses": 0, "win_pct": 0.0})
+    
+    st.markdown("### 🏟️ Home vs Away Performance Split")
+    st.caption("Comparison of historical win ratios at home venue vs all away and neutral grounds.")
+    
+    col_home, col_away = st.columns(2)
+    
+    with col_home:
+        html_h = f"""
+        <div style="background: rgba(26, 26, 46, 0.4); border: 1px solid rgba(245, 166, 35, 0.2); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 1.05rem; font-weight: bold; color: #f5a623;">🏠 Home Venue Performance</span>
+                <span style="font-size: 1.3rem; font-weight: bold; color: #f5a623;">{home['win_pct']}% Win</span>
+            </div>
+            <div style="font-size: 0.9rem; color: #ccd6f6;">Matches Played: <strong>{home['matches']}</strong></div>
+            <div style="font-size: 0.9rem; color: #ccd6f6;">Wins: <strong>{home['wins']}</strong> | Losses: <strong>{home['losses']}</strong></div>
+            <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 0.25rem;">
+                <div style="background: #f5a623; width: {home['win_pct']}%; height: 100%;"></div>
+            </div>
+        </div>
+        """
+        st.markdown(html_h.replace("\n", "").strip(), unsafe_allow_html=True)
+        
+    with col_away:
+        html_a = f"""
+        <div style="background: rgba(26, 26, 46, 0.4); border: 1px solid rgba(233, 69, 96, 0.2); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 1.05rem; font-weight: bold; color: #e94560;">✈️ Away / Neutral Performance</span>
+                <span style="font-size: 1.3rem; font-weight: bold; color: #e94560;">{away['win_pct']}% Win</span>
+            </div>
+            <div style="font-size: 0.9rem; color: #ccd6f6;">Matches Played: <strong>{away['matches']}</strong></div>
+            <div style="font-size: 0.9rem; color: #ccd6f6;">Wins: <strong>{away['wins']}</strong> | Losses: <strong>{away['losses']}</strong></div>
+            <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 0.25rem;">
+                <div style="background: #e94560; width: {away['win_pct']}%; height: 100%;"></div>
+            </div>
+        </div>
+        """
+        st.markdown(html_a.replace("\n", "").strip(), unsafe_allow_html=True)
+    st.write("")
+
+
+def render_opponents_breakdown(opponents: list[dict], team_name: str) -> None:
+    """Render stacked horizontal bar chart against all opponents."""
+    if not opponents:
+        return
+        
+    st.markdown("### ⚔️ Opponents Head-to-Head Win/Loss Breakdown")
+    st.caption("Historical win ratio details against all opponent franchises (ordered by matches played).")
+    
+    opp_labels = [o["short_name"] for o in opponents]
+    opp_full_names = [o["opponent"] for o in opponents]
+    wins = [o["wins"] for o in opponents]
+    losses = [o["losses"] for o in opponents]
+    no_results = [o["no_results"] for o in opponents]
+    
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        y=opp_labels,
+        x=wins,
+        name="Wins",
+        orientation="h",
+        marker_color="#f5a623",
+        hovertemplate="vs %{customdata}: %{x} Wins<extra></extra>",
+        customdata=opp_full_names
+    ))
+    fig.add_trace(go.Bar(
+        y=opp_labels,
+        x=losses,
+        name="Losses",
+        orientation="h",
+        marker_color="#e94560",
+        hovertemplate="vs %{customdata}: %{x} Losses<extra></extra>",
+        customdata=opp_full_names
+    ))
+    fig.add_trace(go.Bar(
+        y=opp_labels,
+        x=no_results,
+        name="No Results / Ties",
+        orientation="h",
+        marker_color="rgba(255, 255, 255, 0.2)",
+        hovertemplate="vs %{customdata}: %{x} No Results<extra></extra>",
+        customdata=opp_full_names
+    ))
+    
+    fig.update_layout(
+        template="plotly_dark",
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        barmode="stack",
+        height=max(350, len(opponents) * 35),
+        margin=dict(t=20, b=40, l=60, r=20),
+        font=dict(color="#8892b0"),
+        legend=dict(font=dict(color="#ccd6f6")),
+        yaxis=dict(autorange="reversed")
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+
 # --- Main Content ---
 st.title("🏆 Team Analytics")
 st.markdown("Explore team performance, win records, and season trends (2008–2025)")
@@ -142,6 +308,8 @@ if not data:
 
 stats = data["stats"]
 season_perf = data["season_performance"]
+home_away = data.get("home_away", {})
+opponents = data.get("opponents", [])
 
 # ── Sidebar dynamic profile card ──
 with st.sidebar:
@@ -209,6 +377,22 @@ with col2:
 with col3:
     no_res = stats.get("no_results", 0)
     st.metric("No Results", f"{no_res}")
+
+st.divider()
+
+# --- Dynamic Championship Glory Panel ---
+champions_list = fetch_champions()
+team_titles = []
+if champions_list:
+    for champ in champions_list:
+        if champ.get("champion") == selected_team:
+            team_titles.append(champ)
+
+if team_titles:
+    render_championships_glory_panel(team_titles, selected_team)
+
+# --- Home vs Away Performance Split ---
+render_home_away_split(home_away, selected_team)
 
 st.divider()
 
@@ -313,3 +497,8 @@ with col2:
         )],
     )
     st.plotly_chart(fig, use_container_width=True)
+
+st.divider()
+
+# --- Opponents Head-to-Head Breakdown ---
+render_opponents_breakdown(opponents, selected_team)

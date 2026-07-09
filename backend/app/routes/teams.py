@@ -17,6 +17,8 @@ from backend.app.analytics.team_analytics import (
     get_team_stats,
     get_team_season_performance,
     search_teams,
+    get_team_home_away_stats,
+    get_team_opponents_stats,
 )
 
 logger = logging.getLogger(__name__)
@@ -51,23 +53,28 @@ def get_team(
     """
     Get comprehensive statistics for a team.
 
-    Returns overall stats and season-wise performance.
+    Returns overall stats, season-wise performance, home/away split, and opponents H2H.
 
     Example: GET /teams/Mumbai Indians
     """
     logger.info("API request: team stats for '%s'", name)
 
-    stats = get_team_stats(db, name)
-
-    if not stats:
+    from backend.app.models.team import Team
+    team = db.query(Team).filter(Team.name == name).first()
+    if not team:
         raise HTTPException(
             status_code=404,
             detail=f"Team '{name}' not found.",
         )
 
+    stats = get_team_stats(db, name)
     season_performance = get_team_season_performance(db, name)
+    home_away = get_team_home_away_stats(db, name, team.id)
+    opponents = get_team_opponents_stats(db, team.id)
 
     return {
         "stats": stats,
         "season_performance": season_performance,
+        "home_away": home_away,
+        "opponents": opponents
     }

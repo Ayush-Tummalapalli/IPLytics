@@ -232,3 +232,122 @@ def search_teams(session: Session, query: str) -> list[dict]:
         {"id": t.id, "name": t.name, "short_name": t.short_name}
         for t in results
     ]
+
+
+HOME_VENUES = {
+    "Chennai Super Kings": ["MA Chidambaram Stadium", "MA Chidambaram Stadium, Chepauk", "MA Chidambaram Stadium, Chepauk, Chennai"],
+    "Mumbai Indians": ["Wankhede Stadium", "Wankhede Stadium, Mumbai"],
+    "Royal Challengers Bengaluru": ["M Chinnaswamy Stadium", "M.Chinnaswamy Stadium"],
+    "Royal Challengers Bangalore": ["M Chinnaswamy Stadium", "M.Chinnaswamy Stadium"],
+    "Kolkata Knight Riders": ["Eden Gardens", "Eden Gardens, Kolkata"],
+    "Sunrisers Hyderabad": ["Rajiv Gandhi International Stadium", "Rajiv Gandhi International Stadium, Uppal"],
+    "Delhi Capitals": ["Arun Jaitley Stadium", "Feroz Shah Kotla"],
+    "Delhi Daredevils": ["Arun Jaitley Stadium", "Feroz Shah Kotla"],
+    "Rajasthan Royals": ["Sawai Mansingh Stadium"],
+    "Punjab Kings": ["Punjab Cricket Association IS Bindra Stadium, Mohali", "Punjab Cricket Association Stadium, Mohali"],
+    "Kings XI Punjab": ["Punjab Cricket Association IS Bindra Stadium, Mohali", "Punjab Cricket Association Stadium, Mohali"],
+    "Lucknow Super Giants": ["Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium", "Ekana Cricket Stadium"],
+    "Gujarat Titans": ["Narendra Modi Stadium"]
+}
+
+
+def get_team_home_away_stats(session: Session, team_name: str, team_id: int) -> dict:
+    """Compute win/loss metrics split by home venue vs away/neutral venues."""
+    home_names = HOME_VENUES.get(team_name, [])
+    if not home_names and "Royal Challengers" in team_name:
+        home_names = HOME_VENUES.get("Royal Challengers Bengaluru", [])
+    elif not home_names and "Delhi" in team_name:
+        home_names = HOME_VENUES.get("Delhi Capitals", [])
+    elif not home_names and "Punjab" in team_name:
+        home_names = HOME_VENUES.get("Punjab Kings", [])
+
+    if not home_names:
+        return {}
+
+    all_matches = session.query(Match).filter(
+        or_(Match.team1_id == team_id, Match.team2_id == team_id)
+    ).all()
+
+    home_matches = []
+    away_matches = []
+
+    for m in all_matches:
+        is_home = False
+        for name in home_names:
+            if name.lower() in (m.venue or "").lower():
+                is_home = True
+                break
+        if is_home:
+            home_matches.append(m)
+        else:
+            away_matches.append(m)
+
+    def compute_split(matches):
+        tot = len(matches)
+        if tot == 0:
+            return {"matches": 0, "wins": 0, "losses": 0, "win_pct": 0.0}
+        wins = sum(1 for m in matches if m.winner_id == team_id)
+        no_res = sum(1 for m in matches if m.winner_id is None)
+        losses = tot - wins - no_res
+        win_pct = round((wins / tot) * 100, 2)
+        return {
+            "matches": tot,
+            "wins": wins,
+            "losses": losses,
+            "win_pct": win_pct
+        }
+
+    return {
+        "home": compute_split(home_matches),
+        "away": compute_split(away_matches)
+    }
+
+
+def get_team_opponents_stats(session: Session, team_id: int) -> list[dict]:
+    """Compute win/loss ratios against every other opponent franchise dynamically."""
+    matches = session.query(
+        Match.id,
+        Match.team1_id,
+        Match.team2_id,
+        Match.winner_id
+    ).filter(
+        or_(Match.team1_id == team_id, Match.team2_id == team_id)
+    ).all()
+
+    opponents = {}
+    teams = session.query(Team.id, Team.name, Team.short_name).all()
+    team_names = {t.id: (t.name, t.short_name) for t in teams}
+
+    for m in matches:
+        opp_id = m.team2_id if m.team1_id == team_id else m.team1_id
+        if opp_id not in team_names:
+            continue
+        
+        opp_name, opp_short = team_names[opp_id]
+        if opp_short not in opponents:
+            opponents[opp_short] = {
+                "opponent": opp_name,
+                "short_name": opp_short,
+                "matches": 0,
+                "wins": 0,
+                "losses": 0,
+                "no_results": 0
+            }
+            
+        stats = opponents[opp_short]
+        stats["matches"] += 1
+        if m.winner_id == team_id:
+            stats["wins"] += 1
+        elif m.winner_id is None:
+            stats["no_results"] += 1
+        else:
+            stats["losses"] += 1
+
+    results = []
+    for opp, stats in opponents.items():
+        tot = stats["matches"]
+        stats["win_pct"] = round((stats["wins"] / tot) * 100, 2) if tot > 0 else 0.0
+        results.append(stats)
+
+    results.sort(key=lambda x: x["matches"], reverse=True)
+    return results
