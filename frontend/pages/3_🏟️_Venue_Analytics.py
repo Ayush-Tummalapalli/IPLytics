@@ -272,18 +272,48 @@ if selected:
         st.markdown(clean_html(f"""
         <div style="background: rgba(26, 26, 46, 0.4); border: 1px solid rgba(233, 69, 96, 0.15); border-radius: 12px; padding: 1.25rem; height: 350px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
             <h5 style="margin: 0; color: #f5a623; position: absolute; top: 1.25rem; left: 1.25rem; font-weight: 700; font-size: 1.15rem;">📐 Boundary Lengths</h5>
-            <svg viewBox="0 0 200 200" width="180" height="180" style="margin-top: 1.5rem;">
-                <circle cx="100" cy="100" r="85" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2" stroke-dasharray="4"/>
-                <ellipse cx="100" cy="100" rx="80" ry="75" fill="rgba(15, 52, 96, 0.1)" stroke="#e94560" stroke-width="2" />
-                <ellipse cx="100" cy="100" rx="45" ry="40" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.5" stroke-dasharray="3"/>
-                <rect x="96" y="85" width="8" height="30" fill="#f5a623" opacity="0.8" rx="1"/>
-                <line x1="100" y1="85" x2="100" y2="25" stroke="#ccd6f6" stroke-width="1" stroke-dasharray="2"/>
-                <text x="100" y="20" fill="#ccd6f6" font-size="8" text-anchor="middle" font-weight="bold">Straight: {details['str']}m</text>
-                <line x1="96" y1="100" x2="20" y2="100" stroke="#ccd6f6" stroke-width="1" stroke-dasharray="2"/>
-                <text x="15" y="103" fill="#ccd6f6" font-size="8" text-anchor="end" font-weight="bold">Off: {details['off']}m</text>
-                <line x1="104" y1="100" x2="180" y2="100" stroke="#ccd6f6" stroke-width="1" stroke-dasharray="2"/>
-                <text x="185" y="103" fill="#ccd6f6" font-size="8" text-anchor="start" font-weight="bold">Leg: {details['leg']}m</text>
-            </svg>
+            <div style="width: 100%; display: flex; justify-content: center; margin-top: 2rem;">
+                <svg viewBox="0 0 340 240" width="100%" height="240" style="max-width: 340px;">
+                    <defs>
+                        <radialGradient id="fieldGrad" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#143e21" />
+                            <stop offset="100%" stop-color="#0a2212" />
+                        </radialGradient>
+                    </defs>
+                    <!-- Cricket Turf Field -->
+                    <ellipse cx="170" cy="125" rx="100" ry="80" fill="url(#fieldGrad)" stroke="#1c502b" stroke-width="2.5" />
+                    
+                    <!-- 30-Yard Circle -->
+                    <ellipse cx="170" cy="125" rx="55" ry="44" fill="none" stroke="rgba(255, 255, 255, 0.18)" stroke-width="1.2" stroke-dasharray="3" />
+                    
+                    <!-- Center Pitch -->
+                    <rect x="166" y="110" width="8" height="30" fill="#dfc08a" rx="1" />
+                    <line x1="164" y1="113" x2="176" y2="113" stroke="white" stroke-width="0.8" opacity="0.5"/>
+                    <line x1="164" y1="137" x2="176" y2="137" stroke="white" stroke-width="0.8" opacity="0.5"/>
+                    
+                    <!-- Rope Boundary line -->
+                    <ellipse cx="170" cy="125" rx="90" ry="72" fill="none" stroke="#e94560" stroke-width="3" opacity="0.9" />
+                    
+                    <!-- Measurements -->
+                    <!-- Straight -->
+                    <line x1="170" y1="110" x2="170" y2="53" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="3"/>
+                    <circle cx="170" cy="53" r="3" fill="#f5a623" />
+                    <rect x="125" y="12" width="90" height="20" rx="4" fill="rgba(15, 15, 35, 0.9)" stroke="rgba(245, 166, 35, 0.5)" stroke-width="1"/>
+                    <text x="170" y="25" fill="#f5a623" font-size="9" text-anchor="middle" font-weight="bold" font-family="Outfit">Straight: {details['str']}m</text>
+                    
+                    <!-- Off Side -->
+                    <line x1="166" y1="125" x2="80" y2="125" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="3"/>
+                    <circle cx="80" cy="125" r="3" fill="#f5a623" />
+                    <rect x="20" y="115" width="55" height="20" rx="4" fill="rgba(15, 15, 35, 0.9)" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1"/>
+                    <text x="47" y="128" fill="#ccd6f6" font-size="9" text-anchor="middle" font-weight="bold" font-family="Outfit">Off: {details['off']}m</text>
+                    
+                    <!-- Leg Side -->
+                    <line x1="174" y1="125" x2="260" y2="125" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="3"/>
+                    <circle cx="260" cy="125" r="3" fill="#f5a623" />
+                    <rect x="265" y="115" width="55" height="20" rx="4" fill="rgba(15, 15, 35, 0.9)" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1"/>
+                    <text x="292" y="128" fill="#ccd6f6" font-size="9" text-anchor="middle" font-weight="bold" font-family="Outfit">Leg: {details['leg']}m</text>
+                </svg>
+            </div>
         </div>
         """), unsafe_allow_html=True)
 
