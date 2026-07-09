@@ -167,6 +167,16 @@ with tab1:
             description=f"**{hs.get('player')}** smashed this legendary score against the **{hs.get('opponent', {}).get('name', 'opponent')}** on **{hs_match.get('date')}** at **{hs_match.get('venue')}** during the **{hs_match.get('season')}** season."
         )
         
+        msi = records.get("most_sixes_innings", {})
+        msi_match = msi.get("match", {})
+        render_card(
+            icon="🚀",
+            badge="Innings Fireworks",
+            title="Most Sixes in a Single Innings",
+            value=f"{msi.get('value', 0)} Sixes",
+            description=f"**{msi.get('player')}** cleared the boundary ropes this many times in a single match against **{msi_match.get('team1', {}).get('name') if msi_match.get('team1', {}).get('name') != msi.get('player') else msi_match.get('team2', {}).get('name')}** on **{msi_match.get('date')}**."
+        )
+        
         du = records.get("most_ducks", {})
         render_card(
             icon="🦆",
@@ -184,6 +194,24 @@ with tab1:
             title="Most Career Hundreds",
             value=f"{mc.get('value', 0)} Centuries",
             description=f"**{mc.get('player')}** holds the record for scoring the most centuries in the tournament, reaching the magical three-figure mark multiple times."
+        )
+        
+        mfifty = records.get("most_fifties", {})
+        render_card(
+            icon="🔥",
+            badge="Consistency Beacon",
+            title="Most Career Fifties",
+            value=f"{mfifty.get('value', 0)} Fifties",
+            description=f"**{mfifty.get('player')}** has reached the half-century mark (between 50 and 99 runs) the most times in tournament history, anchoring innings with clinical consistency."
+        )
+        
+        csix = records.get("career_sixes", {})
+        render_card(
+            icon="💥",
+            badge="Six-Hitting Legend",
+            title="Most Career Sixes",
+            value=f"{csix.get('value', 0):,} Sixes",
+            description=f"**{csix.get('player')}** is the tournament's overall leading six-hitter, clearing the ropes with ease and intimidating bowling lineups year after year."
         )
         
         render_card(
@@ -235,6 +263,15 @@ with tab2:
             description=f"**{bb.get('player')}** tore through the opposition line-up in the **{bb_match.get('season')}** season on **{bb_match.get('date')}** at **{bb_match.get('venue')}**."
         )
         
+        cdots = records.get("career_dots", {})
+        render_card(
+            icon="🎳",
+            badge="Pressure Builder",
+            title="Most Career Dot Balls Bowled",
+            value=f"{cdots.get('value', 0):,} Dots",
+            description=f"**{cdots.get('player')}** leads IPL history in bowling dot balls (deliveries with 0 runs and no extras), creating immense pressure on the batting side."
+        )
+
         eo = records.get("expensive_over", {})
         eo_match = eo.get("match", {})
         render_card(
@@ -345,6 +382,15 @@ with tab3:
             description=f"Achieved by **{lw_runs.get('team', {}).get('name')}** on **{lw_runs_match.get('date')}** at **{lw_runs_match.get('venue')}**."
         )
         
+        fdis = records.get("fielder_dismissals", {})
+        render_card(
+            icon="🧤",
+            badge="Safe Hands",
+            title="Most Fielder/Keeper Dismissals",
+            value=f"{fdis.get('value', 0)} Dismissals",
+            description=f"**{fdis.get('player')}** has completed the most dismissals as a fielder or wicket-keeper (combining catches and stumpings) in IPL history."
+        )
+
         render_card(
             icon="🤝",
             badge="Thrills",

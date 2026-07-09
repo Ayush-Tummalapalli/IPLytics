@@ -477,6 +477,95 @@ def get_ipl_facts(session: Session) -> dict:
             "match": m_info
         }
 
+    # 26. Most Sixes in an Innings
+    most_sixes_innings_agg = (
+        session.query(
+            Delivery.match_id,
+            Delivery.batter,
+            func.count(Delivery.id).label("sixes")
+        )
+        .filter(Delivery.runs_batter == 6)
+        .group_by(Delivery.match_id, Delivery.innings, Delivery.batter)
+        .order_by(desc("sixes"))
+        .first()
+    )
+    most_sixes_innings = {}
+    if most_sixes_innings_agg:
+        m_info = get_match_info(most_sixes_innings_agg[0])
+        most_sixes_innings = {
+            "player": most_sixes_innings_agg[1],
+            "value": int(most_sixes_innings_agg[2]),
+            "match": m_info
+        }
+
+    # 27. Most Career Sixes
+    career_sixes_agg = (
+        session.query(Delivery.batter, func.count(Delivery.id).label("sixes"))
+        .filter(Delivery.runs_batter == 6)
+        .group_by(Delivery.batter)
+        .order_by(desc("sixes"))
+        .first()
+    )
+    career_sixes = {
+        "player": career_sixes_agg[0] if career_sixes_agg else "Unknown",
+        "value": int(career_sixes_agg[1]) if career_sixes_agg else 0
+    }
+
+    # 28. Most Career Dot Balls
+    career_dots_agg = (
+        session.query(Delivery.bowler, func.count(Delivery.id).label("dots"))
+        .filter(
+            Delivery.runs_batter == 0,
+            Delivery.runs_extras == 0
+        )
+        .group_by(Delivery.bowler)
+        .order_by(desc("dots"))
+        .first()
+    )
+    career_dots = {
+        "player": career_dots_agg[0] if career_dots_agg else "Unknown",
+        "value": int(career_dots_agg[1]) if career_dots_agg else 0
+    }
+
+    # 29. Most Career Fifties
+    fifty_sub = (
+        session.query(
+            Delivery.match_id,
+            Delivery.innings,
+            Delivery.batter,
+            func.sum(Delivery.runs_batter).label("runs")
+        )
+        .group_by(Delivery.match_id, Delivery.innings, Delivery.batter)
+        .having(and_(func.sum(Delivery.runs_batter) >= 50, func.sum(Delivery.runs_batter) < 100))
+        .subquery()
+    )
+    most_fifties_agg = (
+        session.query(fifty_sub.c.batter, func.count(fifty_sub.c.match_id).label("cnt"))
+        .group_by(fifty_sub.c.batter)
+        .order_by(desc("cnt"))
+        .first()
+    )
+    most_fifties = {
+        "player": most_fifties_agg[0] if most_fifties_agg else "Unknown",
+        "value": int(most_fifties_agg[1]) if most_fifties_agg else 0
+    }
+
+    # 30. Most Fielder/Keeper Dismissals
+    fielder_dismissals_agg = (
+        session.query(Delivery.fielder, func.count(Delivery.id).label("cnt"))
+        .filter(
+            Delivery.fielder.isnot(None),
+            Delivery.wicket_kind.in_(["caught", "stumped"])
+        )
+        .group_by(Delivery.fielder)
+        .order_by(desc("cnt"))
+        .first()
+    )
+    fielder_dismissals = {
+        "player": fielder_dismissals_agg[0] if fielder_dismissals_agg else "Unknown",
+        "value": int(fielder_dismissals_agg[1]) if fielder_dismissals_agg else 0
+    }
+
     return {
         "totals": {
             "matches": total_matches,
@@ -506,6 +595,11 @@ def get_ipl_facts(session: Session) -> dict:
             "chase_ratio": chase_ratio,
             "bat_first_ratio": bat_first_ratio,
             "most_centuries": most_centuries,
-            "expensive_over": expensive_over
+            "expensive_over": expensive_over,
+            "most_sixes_innings": most_sixes_innings,
+            "career_sixes": career_sixes,
+            "career_dots": career_dots,
+            "most_fifties": most_fifties,
+            "fielder_dismissals": fielder_dismissals
         }
     }
