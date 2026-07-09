@@ -301,17 +301,17 @@ if selected:
                     <rect x="125" y="12" width="90" height="20" rx="4" fill="rgba(15, 15, 35, 0.9)" stroke="rgba(245, 166, 35, 0.5)" stroke-width="1"/>
                     <text x="170" y="25" fill="#f5a623" font-size="9" text-anchor="middle" font-weight="bold" font-family="Outfit">Straight: {details['str']}m</text>
                     
-                    <!-- Off Side -->
+                    <!-- Leg Side (Left) -->
                     <line x1="166" y1="125" x2="80" y2="125" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="3"/>
                     <circle cx="80" cy="125" r="3" fill="#f5a623" />
                     <rect x="20" y="115" width="55" height="20" rx="4" fill="rgba(15, 15, 35, 0.9)" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1"/>
-                    <text x="47" y="128" fill="#ccd6f6" font-size="9" text-anchor="middle" font-weight="bold" font-family="Outfit">Off: {details['off']}m</text>
+                    <text x="47" y="128" fill="#ccd6f6" font-size="9" text-anchor="middle" font-weight="bold" font-family="Outfit">Leg: {details['leg']}m</text>
                     
-                    <!-- Leg Side -->
+                    <!-- Off Side (Right) -->
                     <line x1="174" y1="125" x2="260" y2="125" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="3"/>
                     <circle cx="260" cy="125" r="3" fill="#f5a623" />
                     <rect x="265" y="115" width="55" height="20" rx="4" fill="rgba(15, 15, 35, 0.9)" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1"/>
-                    <text x="292" y="128" fill="#ccd6f6" font-size="9" text-anchor="middle" font-weight="bold" font-family="Outfit">Leg: {details['leg']}m</text>
+                    <text x="292" y="128" fill="#ccd6f6" font-size="9" text-anchor="middle" font-weight="bold" font-family="Outfit">Off: {details['off']}m</text>
                     
                     <!-- Behind wickets (Bottom) -->
                     <line x1="170" y1="140" x2="170" y2="197" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="3"/>
