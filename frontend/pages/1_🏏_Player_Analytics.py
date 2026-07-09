@@ -159,7 +159,7 @@ def render_bowling_metrics(bowling: dict) -> None:
 
 
 def render_season_runs_chart(season_runs: list[dict], player_name: str, has_batted: bool) -> None:
-    """Plot a bar chart of runs scored per IPL season."""
+    """Plot a premium area line chart of runs scored per IPL season."""
     if not has_batted:
         st.info("This player hasn't batted in his whole career")
         return
@@ -168,32 +168,46 @@ def render_season_runs_chart(season_runs: list[dict], player_name: str, has_batt
         return
 
     df = pd.DataFrame(season_runs)
-    # Ensure 'season' is treated as a categorical axis, not continuous
     df["season"] = df["season"].astype(str)
 
-    fig = px.bar(
-        df,
-        x="season",
-        y="runs",
-        text="runs",
-        title=f"Season-wise Runs — {player_name}",
-        labels={"season": "Season", "runs": "Runs Scored"},
-        template="plotly_dark",
-        color_discrete_sequence=[COLOR_BATTING],
-    )
-    fig.update_traces(textposition="outside")
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=df["season"],
+        y=df["runs"],
+        mode="lines+markers",
+        line=dict(shape="spline", smoothing=1.3, color="#e94560", width=4),
+        marker=dict(size=8, color="#f5a623", symbol="circle", line=dict(color="#1a1a2e", width=1.5)),
+        fill="tozeroy",
+        fillcolor="rgba(233, 69, 96, 0.15)",
+        name="Runs Scored",
+        text=df["runs"],
+        hovertemplate="<b>Season %{x}</b><br>Runs: %{y}<extra></extra>"
+    ))
+
     fig.update_layout(
-        xaxis_title="Season",
-        yaxis_title="Runs",
-        showlegend=False,
-        # Extra top margin so text labels above bars aren't clipped
-        margin=dict(t=60, b=40),
+        title=f"📈 Season-wise Runs — {player_name}",
+        template="plotly_dark",
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        xaxis=dict(
+            showgrid=False,
+            tickfont=dict(color="#8892b0"),
+            linecolor="rgba(255,255,255,0.1)"
+        ),
+        yaxis=dict(
+            gridcolor="rgba(255,255,255,0.05)",
+            gridwidth=1,
+            zeroline=False,
+            tickfont=dict(color="#8892b0")
+        ),
+        margin=dict(t=60, b=40, l=40, r=20),
+        height=350,
     )
     st.plotly_chart(fig, use_container_width=True)
 
 
 def render_season_wickets_chart(season_wickets: list[dict], player_name: str, has_bowled: bool) -> None:
-    """Plot a bar chart of wickets taken per IPL season."""
+    """Plot a premium area line chart of wickets taken per IPL season."""
     if not has_bowled:
         st.info("This player hasn't bowled in his career")
         return
@@ -204,22 +218,38 @@ def render_season_wickets_chart(season_wickets: list[dict], player_name: str, ha
     df = pd.DataFrame(season_wickets)
     df["season"] = df["season"].astype(str)
 
-    fig = px.bar(
-        df,
-        x="season",
-        y="wickets",
-        text="wickets",
-        title=f"Season-wise Wickets — {player_name}",
-        labels={"season": "Season", "wickets": "Wickets Taken"},
-        template="plotly_dark",
-        color_discrete_sequence=["#b085f5"],
-    )
-    fig.update_traces(textposition="outside")
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=df["season"],
+        y=df["wickets"],
+        mode="lines+markers",
+        line=dict(shape="spline", smoothing=1.3, color="#b085f5", width=4),
+        marker=dict(size=8, color="#00bcd4", symbol="circle", line=dict(color="#1a1a2e", width=1.5)),
+        fill="tozeroy",
+        fillcolor="rgba(176, 133, 245, 0.15)",
+        name="Wickets Taken",
+        text=df["wickets"],
+        hovertemplate="<b>Season %{x}</b><br>Wickets: %{y}<extra></extra>"
+    ))
+
     fig.update_layout(
-        xaxis_title="Season",
-        yaxis_title="Wickets",
-        showlegend=False,
-        margin=dict(t=60, b=40),
+        title=f"🎯 Season-wise Wickets — {player_name}",
+        template="plotly_dark",
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        xaxis=dict(
+            showgrid=False,
+            tickfont=dict(color="#8892b0"),
+            linecolor="rgba(255,255,255,0.1)"
+        ),
+        yaxis=dict(
+            gridcolor="rgba(255,255,255,0.05)",
+            gridwidth=1,
+            zeroline=False,
+            tickfont=dict(color="#8892b0")
+        ),
+        margin=dict(t=60, b=40, l=40, r=20),
+        height=350,
     )
     st.plotly_chart(fig, use_container_width=True)
 
