@@ -1,5 +1,8 @@
 # 🏏 IPLytics — AI-Powered IPL Analytics Platform
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://iplytics-tostty6wdsxrbb7jtfp7x9.streamlit.app/)
+[![Backend API](https://img.shields.io/badge/FastAPI-Backend-009688?style=flat&logo=fastapi)](https://iplytics-backend-ss3n.onrender.com/docs)
+
 An intelligent cricket analytics platform that combines **data engineering**, **interactive visualizations**, and **AI-powered insights** to deliver deep analysis of the Indian Premier League (2008–2025).
 
 Live link - https://iplytics-tostty6wdsxrbb7jtfp7x9.streamlit.app/
@@ -127,6 +130,9 @@ This project uses the [Kaggle IPL Dataset](https://www.kaggle.com/datasets/chait
 
 Place these files in `data/raw/` before running the data ingestion pipeline.
 
+> [!TIP]
+> **High-Performance Ingestion:** The database ingestion pipeline utilizes the native PostgreSQL `COPY` protocol (`copy_expert`) combined with vectorized `pandas` processing. This streams the entire ~280,000 delivery dataset into the Neon Cloud database in under **48 seconds**, bypassing standard ORM insert round-trip network overhead.
+
 ---
 
 ## 🗺️ Development Roadmap
@@ -199,8 +205,11 @@ Follow these steps to deploy the production build to the cloud:
    - `GEMINI_API_KEY` = (Your Google Gemini API key)
    - `DEBUG` = `false`
 4. Once deployed, note down your backend URL (e.g., `https://iplytics-backend.onrender.com`).
-5. Open Render's Shell or run locally to migrate the database:
-   `python -m backend.app.database.create_db` and `python -m backend.app.database.ingest`.
+5. Run the database migration and data ingestion from your local terminal (ensure you are on a home network/mobile hotspot if school or corporate firewalls block port 5432):
+   ```bash
+   DATABASE_URL="your-neon-connection-string" python -m backend.app.database.create_db
+   DATABASE_URL="your-neon-connection-string" python -m backend.app.database.ingest
+   ```
 
 ### 3. Frontend Deployment: Streamlit Cloud or Render
 #### Option A: Streamlit Community Cloud (Recommended)
