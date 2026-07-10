@@ -239,5 +239,5 @@ This project is for educational and portfolio purposes.
 
 ## 👤 Author
 
-Built by **Ayush** as a portfolio project for AI/ML and Software Engineering internship applications.
+Built by **Ayush** as a portfolio project and on personal interest.
 
