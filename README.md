@@ -120,7 +120,7 @@ Visit: [http://localhost:8501](http://localhost:8501)
 
 ## 📊 Dataset
 
-This project uses the [Kaggle IPL Dataset](https://www.kaggle.com/datasets) containing:
+This project uses the [Kaggle IPL Dataset](https://www.kaggle.com/datasets/chaitu20/ipl-dataset2008-2025) containing:
 
 - `matches.csv` — Match-level data (2008–2025)
 - `deliveries.csv` — Ball-by-ball delivery data
