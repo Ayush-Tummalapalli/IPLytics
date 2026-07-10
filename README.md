@@ -11,12 +11,14 @@ Live link - https://iplytics-tostty6wdsxrbb7jtfp7x9.streamlit.app/
 
 ## 🚀 Features
 
-- **Player Analytics** — Runs, averages, strike rates, milestones, and season trends
-- **Team Analytics** — Win/loss records, win percentages, and head-to-head comparisons
-- **Venue Analytics** — Scoring patterns, chase success rates, and ground-specific insights
-- **Player & Team Comparisons** — Side-by-side interactive comparisons
-- **Interactive Visualizations** — Rich Plotly charts for every metric
-- **AI Assistant** — Ask natural language questions, powered by Google Gemini
+- **Player Analytics** — Runs, averages, strike rates, boundaries, and season-wise performance charts
+- **Team Analytics** — Overall win/loss records, win percentages, and head-to-head breakdowns
+- **Venue Analytics** — Scoring patterns, boundary compass, chase success rates, and stadium-specific insights
+- **Player & Team Comparisons** — Side-by-side interactive matchups and comparative visualizations
+- **IPL Leaders (Trophy Cabinet)** — Season-wise Orange Cap (runs) and Purple Cap (wickets) leaders presented in a visual gallery
+- **IPL Trivia & Milestones** — A clean grid highlighting records like career fours, single-season wickets, and highest aggregate runs
+- **AI Assistant** — Natural language queries on players, teams, and history powered by Google Gemini with live database context
+- **Premium UI/UX** — Modern Glassmorphism theme, neon hover halos, curved SVG wave dividers, and custom background grid overlays
 
 ---
 
@@ -27,9 +29,9 @@ Live link - https://iplytics-tostty6wdsxrbb7jtfp7x9.streamlit.app/
 | **Backend**     | Python, FastAPI, SQLAlchemy    |
 | **Database**    | PostgreSQL                     |
 | **Data**        | Pandas                         |
-| **Frontend**    | Streamlit                      |
+| **Frontend**    | Streamlit, Custom CSS, SVG     |
 | **Viz**         | Plotly                         |
-| **AI**          | Google Gemini API              |
+| **AI**          | Google Gemini API, RAG         |
 | **Deployment**  | Render, Streamlit Cloud, Neon  |
 
 ---
