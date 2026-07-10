@@ -2,6 +2,8 @@
 
 An intelligent cricket analytics platform that combines **data engineering**, **interactive visualizations**, and **AI-powered insights** to deliver deep analysis of the Indian Premier League (2008–2025).
 
+Live link - https://iplytics-tostty6wdsxrbb7jtfp7x9.streamlit.app/
+
 ---
 
 ## 🚀 Features
